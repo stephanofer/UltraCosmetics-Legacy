@@ -29,7 +29,7 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew obfuscate --no-daemon
       - name: Upload build artifact
-        uses: actions/upload-artifact@v4.3.3 # https://github.com/actions/upload-artifact/releases
+        uses: actions/upload-artifact@v7.0.1 # https://github.com/actions/upload-artifact/releases
         with:
           name: UltraCosmetics-dev
           path: build/libs/UltraCosmetics-*.jar
