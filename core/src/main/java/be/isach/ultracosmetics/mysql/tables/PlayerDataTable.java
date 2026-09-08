@@ -26,6 +26,7 @@ public class PlayerDataTable extends Table {
         tableInfo.add(new Column<>("selfMorphView", "BOOLEAN NOT NULL DEFAULT 1", Boolean.class));
         tableInfo.add(new Column<>("treasureNotifications", "BOOLEAN NOT NULL DEFAULT 0", Boolean.class));
         tableInfo.add(new Column<>("filterByOwned", "BOOLEAN NOT NULL DEFAULT 0", Boolean.class));
+        tableInfo.add(new Column<>("viewKillEffects", "BOOLEAN NOT NULL DEFAULT 1", Boolean.class));
         tableInfo.add(new Column<>("treasureKeys", "INTEGER NOT NULL DEFAULT 0", Integer.class));
     }
 

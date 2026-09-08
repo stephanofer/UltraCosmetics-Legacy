@@ -6,6 +6,7 @@ public enum ProfileKey {
     MORPH_VIEW("Third-Person-Morph-View", "selfMorphView"),
     TREASURE_NOTIFICATION("Treasure-Notifications", "treasureNotifications"),
     FILTER_OWNED("Filter-By-Owned", "filterByOwned"),
+    VIEW_KILL_EFFECTS("View-Kill-Effects", "viewKillEffects"),
     PET_NAMES("Pet-Names", null),
     AMMO("Ammo", null),
     UNLOCKED("Unlocked", null),
@@ -31,7 +32,7 @@ public enum ProfileKey {
         for (ProfileKey key : values()) {
             if (key.toString().equalsIgnoreCase(name)
                     || key.getFileKey().equalsIgnoreCase(name)
-                    || key.getSqlKey().equalsIgnoreCase(name)) {
+                    || (key.getSqlKey() != null && key.getSqlKey().equalsIgnoreCase(name))) {
                 return key;
             }
         }

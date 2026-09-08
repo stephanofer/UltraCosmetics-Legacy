@@ -1,0 +1,31 @@
+Clear:
+  Kill-Effects: <bold><red>Clear current kill effect
+Menu:
+  Kill-Effects:
+    Title: <bold>Kill Effects
+    Button:
+      Name: <bold><aqua>Kill Effects
+      Lore: '<gray>Unlocked: </gray><white><unlocked>'
+      Tooltip-Equip: <bold><aqua>Equip
+      Tooltip-Unequip: <bold><red>Unequip
+Treasure-Chests-Loot:
+  Kill-Effects: |-
+    <aqua>Kill Effect
+    <cosmetic>
+Treasure-Chests-Loot-Messages:
+  Kill-Effects: <prefix> <bold><gold><name> found rare <cosmetic>
+Kill-Effects:
+  Equip: <prefix> <green>You equipped <kill-effectname>.
+  Unequip: <prefix> <gray>You unequipped <kill-effectname>.
+  Controls: <gray>Left click to equip or unequip.
+  Preview-Control: <aqua>Right click for a private preview.
+  Preview-Cooldown: <prefix> <yellow>Please wait before previewing again.
+  Preview-Unavailable: <prefix> <yellow>Preview unavailable. Try an open space or wait a moment.
+  Visibility-On: <green>Kill Effect visibility is on
+  Visibility-Off: <red>Kill Effect visibility is off
+  Visibility-Lore: <gray>Click to toggle other players' Kill Effects.
+  Freeze:
+    name: <bold><aqua>Freeze Kill
+    Description: |-
+      <gray>Seal your defeated opponent in ice,
+      <gray>then shatter it into a burst of frost.

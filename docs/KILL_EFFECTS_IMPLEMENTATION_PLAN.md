@@ -26,8 +26,6 @@ Block 2: Catalog completion + release validation
 
 **Outcome:** every developer can compile, test, package, and run the approved stack before product implementation begins.
 
-Operational commands, decisions, package ownership, manual validation methods, and current evidence are recorded in [`docs/KILL_EFFECTS_DEVELOPMENT_READINESS.md`](KILL_EFFECTS_DEVELOPMENT_READINESS.md).
-
 All exact dependency versions, supported environments, integration restrictions, testing constraints, and local reference locations for this block are defined in [`docs/KILL_EFFECTS_DESIGN.md`](KILL_EFFECTS_DESIGN.md), primarily under **Dependencies**, **Out of Scope**, **Automated Testing Policy**, and **Manual Real-Server Validation**.
 
 ### Parallel Workstreams

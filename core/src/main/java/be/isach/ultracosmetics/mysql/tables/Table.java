@@ -93,7 +93,7 @@ public abstract class Table {
 
     public static String cleanCategoryName(Category cat) {
         if (cat == null) return null;
-        return cat.toString().toLowerCase();
+        return cat.getStorageId();
     }
 
     public static String cleanCategoryName(CosmeticType<?> cosmetic) {
@@ -127,7 +127,8 @@ public abstract class Table {
     protected void ifParseable(String category, String type, BiConsumer<Category, CosmeticType<?>> storeFunc) {
         Category cat;
         try {
-            cat = Category.valueOf(category.toUpperCase());
+            cat = Category.fromStorage(category);
+            if (cat == null) throw new IllegalArgumentException("Unknown category");
         } catch (IllegalArgumentException e) {
             UltraCosmeticsData.get().getPlugin().getSmartLogger().write(SmartLogger.LogLevel.WARNING,
                     "Ignoring cosmetic with unknown category: " + category);

@@ -8,6 +8,10 @@ import be.isach.ultracosmetics.config.ManualCommentConfiguration;
 import be.isach.ultracosmetics.config.MessageManager;
 import be.isach.ultracosmetics.config.SettingsManager;
 import be.isach.ultracosmetics.cosmetics.Category;
+import be.isach.ultracosmetics.cosmetics.killeffects.KillEffectManager;
+import be.isach.ultracosmetics.cosmetics.killeffects.compatibility.KillEffectMigration;
+import be.isach.ultracosmetics.cosmetics.killeffects.render.KillEffectRenderer;
+import be.isach.ultracosmetics.cosmetics.killeffects.render.KillEffectRendererFactory;
 import be.isach.ultracosmetics.cosmetics.type.CosmeticType;
 import be.isach.ultracosmetics.economy.EconomyHandler;
 import be.isach.ultracosmetics.hook.ChestSortHook;
@@ -142,6 +146,11 @@ public class UltraCosmetics extends JavaPlugin {
 
     private UnmovableItemListener unmovableItemListener;
     private TreasureChestManager treasureChestManager;
+    private KillEffectManager killEffectManager;
+
+    public KillEffectManager getKillEffectManager() {
+        return killEffectManager != null && killEffectManager.isAvailable() ? killEffectManager : null;
+    }
 
     /**
      * Manages WorldGuard flags.
@@ -309,6 +318,10 @@ public class UltraCosmetics extends JavaPlugin {
         registerListeners();
 
         // Set up Cosmetics config.
+        if (config.getBoolean("Categories-Enabled.Kill-Effects")) {
+            KillEffectRenderer renderer = KillEffectRendererFactory.create(this);
+            if (renderer != null) killEffectManager = new KillEffectManager(this, renderer);
+        }
         CosmeticType.loadCustomCosmetics();
         CosmeticType.registerAll();
 
@@ -422,6 +435,10 @@ public class UltraCosmetics extends JavaPlugin {
     }
 
     public void shutdown() {
+        if (killEffectManager != null) {
+            killEffectManager.close();
+            killEffectManager = null;
+        }
         // Prepare for re-enable
         HandlerList.unregisterAll(this);
         Bukkit.getScheduler().cancelTasks(this);
@@ -595,6 +612,12 @@ public class UltraCosmetics extends JavaPlugin {
     }
 
     private void configMigration() {
+        Map<String, String> killCategoryPaths = new HashMap<>();
+        killCategoryPaths.put("Categories-Enabled.Death-Effects", "Categories-Enabled.Kill-Effects");
+        killCategoryPaths.put("Categories.Death-Effects.Main-Menu-Item", "Categories.Kill-Effects.Main-Menu-Item");
+        killCategoryPaths.put("Categories.Death-Effects.Go-Back-Arrow", "Categories.Kill-Effects.Go-Back-Arrow");
+        Map<String, Object> existing = config.getValues(true);
+        KillEffectMigration.missingSettings(existing, existing, killCategoryPaths).forEach(config::set);
         ConfigurationSection oldSQL = SettingsManager.getConfig().getConfigurationSection("Ammo-System-For-Gadgets.MySQL");
         if (oldSQL != null) {
             SettingsManager.getConfig().set("MySQL", oldSQL);

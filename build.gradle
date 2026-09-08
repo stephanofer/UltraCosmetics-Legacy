@@ -228,5 +228,16 @@ tasks.register("verifyPacketEventsNotBundled") {
         if (!packetEventsClasses.empty) {
             throw new GradleException('PacketEvents classes must not be bundled in UltraCosmetics.')
         }
+        def adapters = zipTree(tasks.jar.archiveFile.get().asFile).matching {
+            include 'be/isach/ultracosmetics/cosmetics/killeffects/packetevents/PacketEventsKillEffectRenderer*.class'
+        }.files
+        if (adapters.empty) {
+            throw new GradleException('The Kill Effects adapter is missing from the plugin artifact.')
+        }
+        adapters.each { adapter ->
+            if (new String(adapter.bytes, 'ISO-8859-1').contains('be/isach/ultracosmetics/shaded/kyori')) {
+                throw new GradleException('The external PacketEvents adapter must not relocate Adventure signatures.')
+            }
+        }
     }
 }

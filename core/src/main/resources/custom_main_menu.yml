@@ -71,6 +71,6 @@ Slots:
     Menu: PROJECTILE_EFFECTS
   '44':
     Type: OpenCosmeticMenu
-    Menu: DEATH_EFFECTS
+    Menu: KILL_EFFECTS
   '49':
     Type: ClearCosmetic

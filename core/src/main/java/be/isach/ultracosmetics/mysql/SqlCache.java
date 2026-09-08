@@ -14,6 +14,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.Queue;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -58,9 +59,11 @@ public class SqlCache extends CosmeticsProfile {
 
     @Override
     public void clearAllEquipped() {
+        Set<Category> recognized = new HashSet<>(data.getEnabledCosmetics().keySet());
         super.clearAllEquipped();
         if (sql.getEquippedTable() == null) return;
-        queueUpdate(() -> sql.getEquippedTable().clearAllEquipped(uuid));
+        // Unknown legacy selections remain stored until their replacement types are available.
+        queueUpdate(() -> recognized.forEach(category -> sql.getEquippedTable().unsetEquipped(uuid, category)));
     }
 
     @Override
@@ -107,6 +110,12 @@ public class SqlCache extends CosmeticsProfile {
     public void setFilterByOwned(boolean filterByOwned) {
         super.setFilterByOwned(filterByOwned);
         queueUpdate(() -> sql.getPlayerData().setSetting(uuid, ProfileKey.FILTER_OWNED, filterByOwned));
+    }
+
+    @Override
+    public void setViewKillEffects(boolean value) {
+        super.setViewKillEffects(value);
+        queueUpdate(() -> sql.getPlayerData().setSetting(uuid, ProfileKey.VIEW_KILL_EFFECTS, value));
     }
 
     @Override

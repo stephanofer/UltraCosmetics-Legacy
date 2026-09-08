@@ -7,6 +7,7 @@ import be.isach.ultracosmetics.config.SettingsManager;
 import be.isach.ultracosmetics.cosmetics.type.CosmeticType;
 import be.isach.ultracosmetics.cosmetics.type.EmoteType;
 import be.isach.ultracosmetics.cosmetics.type.GadgetType;
+import be.isach.ultracosmetics.cosmetics.type.KillEffectType;
 import be.isach.ultracosmetics.cosmetics.type.MorphType;
 import be.isach.ultracosmetics.cosmetics.type.PetType;
 import be.isach.ultracosmetics.menu.Button;
@@ -17,6 +18,7 @@ import be.isach.ultracosmetics.menu.PurchaseData;
 import be.isach.ultracosmetics.menu.buttons.togglecosmetic.ToggleCosmeticButton;
 import be.isach.ultracosmetics.menu.buttons.togglecosmetic.ToggleEmoteCosmeticButton;
 import be.isach.ultracosmetics.menu.buttons.togglecosmetic.ToggleGadgetCosmeticButton;
+import be.isach.ultracosmetics.menu.buttons.togglecosmetic.ToggleKillEffectButton;
 import be.isach.ultracosmetics.menu.buttons.togglecosmetic.ToggleMorphCosmeticButton;
 import be.isach.ultracosmetics.menu.buttons.togglecosmetic.TogglePetCosmeticButton;
 import be.isach.ultracosmetics.permissions.PermissionManager;
@@ -43,6 +45,9 @@ public abstract class CosmeticButton implements Button {
     private ItemStack stack = null;
 
     public static CosmeticButton fromType(CosmeticType<?> cosmeticType, UltraPlayer ultraPlayer, UltraCosmetics ultraCosmetics) {
+        if (cosmeticType instanceof KillEffectType) {
+            return new ToggleKillEffectButton(ultraCosmetics, (KillEffectType) cosmeticType);
+        }
         if (SettingsManager.getConfig().getBoolean("No-Permission.Custom-Item.enabled") && !ultraPlayer.canEquip(cosmeticType)) {
             return new CosmeticNoPermissionButton(ultraCosmetics, cosmeticType);
         }

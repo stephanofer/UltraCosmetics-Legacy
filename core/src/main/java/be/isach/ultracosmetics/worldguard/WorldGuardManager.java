@@ -70,6 +70,15 @@ public class WorldGuardManager {
         return allowedCosmeticsState(player, category) == CosmeticRegionState.ALLOWED;
     }
 
+    public boolean areCosmeticsAllowedAt(Player player, org.bukkit.Location location, Category category) {
+        if (ultraCosmetics.getProblems().contains(Problem.WORLDGUARD_HOOK_FAILURE)) return false;
+        if (flagManager == null) return true;
+        if (!flagManager.flagCheckAt(UCFlag.COSMETICS, player, location)) return false;
+        Set<Category> blocked = flagManager.categoryFlagCheckAt(player, location);
+        return blocked == null || (!blocked.contains(category)
+                && !(category == Category.KILL_EFFECTS && blocked.contains(Category.DEATH_EFFECTS)));
+    }
+
     public CosmeticRegionState allowedCosmeticsState(Player player, Category category) {
         if (flagManager == null) return CosmeticRegionState.ALLOWED;
 

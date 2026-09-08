@@ -69,7 +69,7 @@ public abstract class CosmeticType<T extends Cosmetic<?>> {
 
     @SuppressWarnings("unchecked")
     public static <V extends CosmeticType<?>> V valueOf(Category cat, String name) {
-        for (CosmeticType<?> type : VALUES.get(cat)) {
+        for (CosmeticType<?> type : valuesOf(cat)) {
             if (type.getConfigName().equalsIgnoreCase(name)) {
                 return (V) type;
             }
@@ -103,7 +103,7 @@ public abstract class CosmeticType<T extends Cosmetic<?>> {
         MorphType.register();
         EmoteType.register();
         ProjectileEffectType.register(version);
-        DeathEffectType.register();
+        KillEffectType.register();
 
         // Permissions registered by cosmetics are not fully calculated until here,
         // reducing loading time.

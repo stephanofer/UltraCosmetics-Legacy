@@ -44,7 +44,7 @@ public class Menus {
         categoryMenus.put(Category.MOUNTS, new MenuMounts(ultraCosmetics));
         categoryMenus.put(Category.PETS, new MenuPets(ultraCosmetics));
         categoryMenus.put(Category.PROJECTILE_EFFECTS, new MenuProjectileEffects(ultraCosmetics));
-        categoryMenus.put(Category.DEATH_EFFECTS, new MenuDeathEffects(ultraCosmetics));
+        categoryMenus.put(Category.KILL_EFFECTS, new MenuKillEffects(ultraCosmetics));
         MenuSuits ms = new MenuSuits(ultraCosmetics);
         categoryMenus.put(Category.SUITS_HELMET, ms);
         categoryMenus.put(Category.SUITS_CHESTPLATE, ms);

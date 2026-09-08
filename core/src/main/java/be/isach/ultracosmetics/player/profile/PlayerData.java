@@ -26,6 +26,11 @@ public class PlayerData {
     private boolean morphSelfView;
     private boolean treasureNotifications;
     private boolean filterByOwned;
+    private boolean viewKillEffects = true;
+    private final Set<String> unresolvedUnlocks = new HashSet<>();
+
+    public boolean isViewKillEffects() { return viewKillEffects; }
+    public void setViewKillEffects(boolean value) { viewKillEffects = value; }
     private Map<PetType, String> petNames = new HashMap<>();
     private Map<GadgetType, Integer> ammo = new HashMap<>();
     private Map<Category, CosmeticType<?>> enabledCosmetics = new HashMap<>();
@@ -120,10 +125,13 @@ public class PlayerData {
 
         CosmeticType<?> type;
         for (String value : sm.getStringList(ProfileKey.UNLOCKED.getFileKey())) {
-            String[] parts = value.split(":");
-            Category cat = Category.valueOf(parts[0]);
-            type = cat.valueOfType(parts[1]);
-            if (type == null) continue;
+            String[] parts = value.split(":", 2);
+            Category cat = Category.fromStorage(parts[0]);
+            type = parts.length == 2 && cat != null ? cat.valueOfType(parts[1]) : null;
+            if (type == null) {
+                unresolvedUnlocks.add(value);
+                continue;
+            }
             unlockedCosmetics.add(type);
         }
 
@@ -132,13 +140,15 @@ public class PlayerData {
         morphSelfView = sm.getBoolean(ProfileKey.MORPH_VIEW.getFileKey(), true);
         treasureNotifications = sm.getBoolean(ProfileKey.TREASURE_NOTIFICATION.getFileKey(), true);
         filterByOwned = sm.getBoolean(ProfileKey.FILTER_OWNED.getFileKey(), false);
+        viewKillEffects = sm.getBoolean(ProfileKey.VIEW_KILL_EFFECTS.getFileKey(), true);
     }
 
     private void loadEquippedFromFile(SettingsManager sm) {
         ConfigurationSection s = sm.fileConfiguration.getConfigurationSection("enabled");
         boolean changed = false;
         for (Category cat : Category.values()) {
-            String key = cat.toString().toLowerCase();
+            if (cat == Category.DEATH_EFFECTS) continue;
+            String key = cat.getStorageId();
             String oldKey = key.substring(0, key.length() - 1);
             String value;
             if (s.isString(oldKey)) {
@@ -166,10 +176,15 @@ public class PlayerData {
         data.set(ProfileKey.MORPH_VIEW.getFileKey(), morphSelfView);
         data.set(ProfileKey.TREASURE_NOTIFICATION.getFileKey(), treasureNotifications);
         data.set(ProfileKey.FILTER_OWNED.getFileKey(), filterByOwned);
+        data.set(ProfileKey.VIEW_KILL_EFFECTS.getFileKey(), viewKillEffects);
 
         for (Category cat : Category.enabled()) {
             CosmeticType<?> type = enabledCosmetics.get(cat);
-            data.set("enabled." + cat.toString().toLowerCase(), type == null ? null : type.getConfigName().toLowerCase());
+            String key = "enabled." + cat.getStorageId();
+            String previous = data.getString(key);
+            // Keep selections whose Block 2 replacement has not been registered yet.
+            if (cat == Category.KILL_EFFECTS && type == null && previous != null && cat.valueOfType(previous) == null) continue;
+            data.set(key, type == null ? null : type.getConfigName().toLowerCase());
         }
 
         for (Entry<PetType, String> entry : petNames.entrySet()) {
@@ -183,8 +198,8 @@ public class PlayerData {
             data.set(ProfileKey.AMMO.getFileKey() + "." + entry.getKey().getConfigName().toLowerCase(), amount);
         }
 
-        List<String> unlocked = new ArrayList<>();
-        unlockedCosmetics.forEach(k -> unlocked.add(k.getCategory() + ":" + k.getConfigName()));
+        List<String> unlocked = new ArrayList<>(unresolvedUnlocks);
+        unlockedCosmetics.forEach(k -> unlocked.add(k.getCategory().getStorageId().toUpperCase(java.util.Locale.ROOT) + ":" + k.getConfigName()));
         data.set(ProfileKey.UNLOCKED.getFileKey(), unlocked);
         data.save();
     }
@@ -200,6 +215,7 @@ public class PlayerData {
         morphSelfView = (boolean) settings.get(ProfileKey.MORPH_VIEW.getSqlKey());
         treasureNotifications = (boolean) settings.get(ProfileKey.TREASURE_NOTIFICATION.getSqlKey());
         filterByOwned = (boolean) settings.get(ProfileKey.FILTER_OWNED.getSqlKey());
+        viewKillEffects = (boolean) settings.get(ProfileKey.VIEW_KILL_EFFECTS.getSqlKey());
         keys = (int) settings.get(ProfileKey.KEYS.getSqlKey());
         if (sql.getPetNames() != null) {
             petNames = sql.getPetNames().getAllPetNames(uuid);
@@ -226,6 +242,7 @@ public class PlayerData {
         pd.setSetting(uuid, ProfileKey.MORPH_VIEW, morphSelfView);
         pd.setSetting(uuid, ProfileKey.TREASURE_NOTIFICATION, treasureNotifications);
         pd.setSetting(uuid, ProfileKey.FILTER_OWNED, filterByOwned);
+        pd.setSetting(uuid, ProfileKey.VIEW_KILL_EFFECTS, viewKillEffects);
 
         if (sql.getPetNames() != null) {
             sql.getPetNames().setAllPetNames(uuid, petNames);

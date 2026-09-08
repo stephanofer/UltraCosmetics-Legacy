@@ -137,6 +137,15 @@ public abstract class CosmeticsProfile {
         return data.isFilterByOwned();
     }
 
+    public boolean isLoaded() { return loaded.get(); }
+
+    public boolean isViewKillEffects() { return data.isViewKillEffects(); }
+
+    public void setViewKillEffects(boolean value) {
+        data.setViewKillEffects(value);
+        if (!value && ultraCosmetics.getKillEffectManager() != null) ultraCosmetics.getKillEffectManager().hideFrom(uuid);
+    }
+
     public void setFilterByOwned(boolean filterByOwned) {
         data.setFilterByOwned(filterByOwned);
     }

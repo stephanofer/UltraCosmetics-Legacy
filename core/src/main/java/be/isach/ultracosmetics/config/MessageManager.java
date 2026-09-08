@@ -53,6 +53,15 @@ public class MessageManager {
 
         Reader reader = UltraCosmeticsData.get().getPlugin().getFileReader("messages/" + langFile + ".yml");
         loadMessages(YamlConfiguration.loadConfiguration(reader));
+        // Shared English defaults until the new category is translated; local overrides always win.
+        try (Reader killEffects = UltraCosmeticsData.get().getPlugin().getFileReader("messages/killeffects.yml")) {
+            YamlConfiguration defaults = YamlConfiguration.loadConfiguration(killEffects);
+            for (String key : defaults.getKeys(true)) {
+                if (defaults.isString(key)) addMessageInternal(key, defaults.getString(key));
+            }
+        } catch (java.io.IOException e) {
+            throw new IllegalStateException("Cannot load Kill Effects messages", e);
+        }
         messagesConfig.save();
         miniMessage = buildMinimessage(true);
         success = true;

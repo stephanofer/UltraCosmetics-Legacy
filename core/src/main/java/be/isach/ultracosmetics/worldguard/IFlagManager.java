@@ -14,4 +14,8 @@ public interface IFlagManager {
     public boolean flagCheck(UCFlag flag, Player player);
 
     public Set<Category> categoryFlagCheck(Player player);
+
+    boolean flagCheckAt(UCFlag flag, Player player, org.bukkit.Location location);
+
+    Set<Category> categoryFlagCheckAt(Player player, org.bukkit.Location location);
 }

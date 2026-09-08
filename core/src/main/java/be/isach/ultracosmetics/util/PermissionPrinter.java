@@ -77,7 +77,7 @@ public class PermissionPrinter {
         writer.println("  - ultracosmetics.updatenotify");
 
         for (Category cat : Category.values()) {
-            if (cat.isSuits()) continue;
+            if (cat.isSuits() || cat == Category.DEATH_EFFECTS) continue;
             writer.println();
             writer.println("### " + cat.getConfigPath().replace("-", " ") + ":");
             writer.println("  - " + cat.getPermission() + ".*");

@@ -49,6 +49,18 @@ public class FlagManager implements IFlagManager {
     }
 
     // from WorldGuard documentation:
+    @Override
+    public boolean flagCheckAt(UCFlag flag, Player player, org.bukkit.Location location) {
+        return WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery().testState(
+                com.sk89q.worldedit.bukkit.BukkitAdapter.adapt(location), WorldGuardPlugin.inst().wrapPlayer(player), flag.getFlag());
+    }
+
+    @Override
+    public Set<Category> categoryFlagCheckAt(Player player, org.bukkit.Location location) {
+        return WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery().queryValue(
+                com.sk89q.worldedit.bukkit.BukkitAdapter.adapt(location), WorldGuardPlugin.inst().wrapPlayer(player), CATEGORY_FLAG);
+    }
+
     // https://worldguard.enginehub.org/en/latest/developer/regions/custom-flags/
     private static final Factory FACTORY = new Factory();
 

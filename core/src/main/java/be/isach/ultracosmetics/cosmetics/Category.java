@@ -3,6 +3,7 @@ package be.isach.ultracosmetics.cosmetics;
 import be.isach.ultracosmetics.UltraCosmeticsData;
 import be.isach.ultracosmetics.config.MessageManager;
 import be.isach.ultracosmetics.config.SettingsManager;
+import be.isach.ultracosmetics.cosmetics.killeffects.compatibility.KillEffectMigration;
 import be.isach.ultracosmetics.cosmetics.suits.ArmorSlot;
 import be.isach.ultracosmetics.cosmetics.type.CosmeticType;
 import be.isach.ultracosmetics.util.ItemFactory;
@@ -37,7 +38,11 @@ public enum Category {
     SUITS_BOOTS(ArmorSlot.BOOTS),
     EMOTES("Emotes", "emotename", "emotes", "e", true),
     PROJECTILE_EFFECTS("Projectile-Effects", "projectile-effectname", "projectileeffects", "p", false),
-    DEATH_EFFECTS("Death-Effects", "death-effectname", "deatheffects", "d", false),
+    KILL_EFFECTS("Kill-Effects", "kill-effectname", "killeffects", "k", false,
+            () -> UltraCosmeticsData.get().getPlugin().getKillEffectManager() != null),
+    // Retained only so WorldGuard can deserialize historical enum flags. Never exposed as a product.
+    @Deprecated
+    DEATH_EFFECTS("Death-Effects", "death-effectname", "deatheffects", "d", false, () -> false),
     ;
 
     // Avoids counting suit categories multiple times since they share settings
@@ -55,11 +60,41 @@ public enum Category {
     }
 
     public static Category fromString(String name) {
+        if (name == null) return null;
+        if (name.equalsIgnoreCase("DEATH_EFFECTS") || name.equalsIgnoreCase("Death-Effects")) return KILL_EFFECTS;
         String lowerName = name.toLowerCase();
         for (Category cat : values()) {
             if (lowerName.startsWith(cat.prefix)) {
-                return cat;
+                return cat == DEATH_EFFECTS ? KILL_EFFECTS : cat;
             }
+        }
+        return null;
+    }
+
+    public String getStorageId() {
+        switch (this) {
+            case PETS: return "pets";
+            case GADGETS: return "gadgets";
+            case EFFECTS: return "effects";
+            case MOUNTS: return "mounts";
+            case MORPHS: return "morphs";
+            case HATS: return "hats";
+            case SUITS_HELMET: return "suits_helmet";
+            case SUITS_CHESTPLATE: return "suits_chestplate";
+            case SUITS_LEGGINGS: return "suits_leggings";
+            case SUITS_BOOTS: return "suits_boots";
+            case EMOTES: return "emotes";
+            case PROJECTILE_EFFECTS: return "projectile_effects";
+            case KILL_EFFECTS:
+            case DEATH_EFFECTS: return "death_effects";
+            default: throw new IllegalStateException("Missing storage identifier for " + this);
+        }
+    }
+
+    public static Category fromStorage(String name) {
+        String canonical = KillEffectMigration.category(name);
+        for (Category category : values()) {
+            if (category != DEATH_EFFECTS && KillEffectMigration.category(category.getStorageId()).equals(canonical)) return category;
         }
         return null;
     }

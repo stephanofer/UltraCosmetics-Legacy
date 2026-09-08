@@ -30,7 +30,7 @@ public class CosmeticTable extends Table {
     public void loadBaseData() {
         InsertQuery insert = insertIgnore("category", "type");
         for (Category cat : Category.values()) {
-            InsertValue catItem = new InsertValue(cat.toString().toLowerCase());
+            InsertValue catItem = new InsertValue(cat.getStorageId());
             for (CosmeticType<?> type : cat.getValues()) {
                 insert.insert(catItem, new InsertValue(type.getConfigName().toLowerCase()));
             }

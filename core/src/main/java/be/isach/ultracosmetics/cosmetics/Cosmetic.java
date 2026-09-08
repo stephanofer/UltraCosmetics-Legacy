@@ -87,7 +87,9 @@ public abstract class Cosmetic<T extends CosmeticType<?>> extends BukkitRunnable
             return;
         }
 
-        ultraCosmetics.getServer().getPluginManager().registerEvents(this, ultraCosmetics);
+        if (registerSelectionListener()) {
+            ultraCosmetics.getServer().getPluginManager().registerEvents(this, ultraCosmetics);
+        }
 
         unequipLikeCosmetics();
 
@@ -143,6 +145,10 @@ public abstract class Cosmetic<T extends CosmeticType<?>> extends BukkitRunnable
     }
 
     protected boolean tryEquip() {
+        return true;
+    }
+
+    protected boolean registerSelectionListener() {
         return true;
     }
 

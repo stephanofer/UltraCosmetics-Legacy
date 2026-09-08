@@ -12,7 +12,21 @@ Categories-Enabled:
   Suits: true
   Emotes: true
   Projectile-Effects: true
-  Death-Effects: true
+  Kill-Effects: true
+# Shared packet-only Kill Effect runtime limits.
+Kill-Effects-Settings:
+  Visible-Range: 32
+  Full-Detail-Range: 16
+  Max-Active-Global: 12
+  Max-Active-Per-World: 6
+  Max-Full-Effects-Per-Chunk: 2
+  Max-Duration-Ticks: 100
+  Max-Entities-Per-Scene: 12
+  Preview-Cooldown: 5
+  Anchor-Search-Distance: 3
+  Sounds: true
+  Respect-Vanish: true
+  Lite-Mode-On-Capacity: true
 
 # Other settings for categories:
 # - The Item in Main Menu.
@@ -51,8 +65,8 @@ Categories:
   Projectile-Effects:
     Main-Menu-Item: ARROW
     Go-Back-Arrow: true
-  Death-Effects:
-    Main-Menu-Item: WITHER_SKELETON_SKULL
+  Kill-Effects:
+    Main-Menu-Item: ICE
     Go-Back-Arrow: true
   Clear-Cosmetic-Item: BARRIER
   Previous-Page-Item: ENDER_PEARL
@@ -208,7 +222,7 @@ TreasureChests:
       Chance: 5
       Message:
         enabled: false
-    Death-Effects:
+    Kill-Effects:
       Enabled: true
       Chance: 5
       Message:
