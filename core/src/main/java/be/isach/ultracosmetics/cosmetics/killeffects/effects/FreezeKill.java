@@ -27,7 +27,7 @@ public final class FreezeKill extends KillEffect {
     @Override
     protected KillEffectExecution createExecution(KillEffectContext context, KillEffectScene scene) {
         final int duration = context.lite ? 12 : KillEffectSettings.clamp(
-                SettingsManager.getConfig().getInt(getType().getConfigPath() + ".Duration", 60), 60, 80);
+                SettingsManager.getConfig().getInt(getType().getConfigPath() + ".Duration", 120), 120, 160);
         return new Execution(context, scene, duration);
     }
 
@@ -36,7 +36,8 @@ public final class FreezeKill extends KillEffect {
         private final KillEffectScene scene;
         private final int duration;
         private final Random random;
-        private int body = -1, lower = -1, upper = -1;
+        private int body = -1;
+        private int[] lower, middle, upper, cap;
         private int previousTick = -1;
 
         private Execution(KillEffectContext context, KillEffectScene scene, int duration) {
@@ -49,9 +50,9 @@ public final class FreezeKill extends KillEffect {
 
         @Override
         protected void onTick(int elapsed) {
-            int t = context.lite ? elapsed : (int) ((long) elapsed * 60 / duration);
+            int t = context.lite ? elapsed : FreezeTimeline.animationTick(elapsed, duration);
             if (elapsed == 0) {
-                if (!context.lite && !context.airborne) body = scene.spawnPlayer();
+                if (!context.lite) body = scene.spawnPlayer();
                 ring(Particle.SNOW, 0.8, 0.15, 24);
                 scene.sound(0.35f, 0.7f);
             }
@@ -59,17 +60,19 @@ public final class FreezeKill extends KillEffect {
                 if (t < 7) ring(Particle.CYAN, 0.7 - t * 0.07, t * 0.22, 12);
                 return;
             }
-            if (!context.airborne) {
-                if (t >= 1 && lower == -1) lower = scene.spawnIce(0);
-                if (t >= 4 && upper == -1) upper = scene.spawnIce(1);
-                // Provisional 2-tick correction; the real-server spike must establish the lowest stable frequency.
-                if (elapsed % 2 == 0 && t < 56) {
-                    double vibration = t >= 43 ? Math.sin(t * 2.4) * 0.025 : 0;
-                    scene.stabilizeIce(lower, vibration, 0);
-                    scene.stabilizeIce(upper, -vibration, 1);
-                }
+            if (t >= 1 && lower == null) lower = scene.spawnIce(0);
+            if (t >= 3 && middle == null) middle = scene.spawnIce(1);
+            if (t >= 5 && upper == null) upper = scene.spawnIce(2);
+            if (t >= 7 && cap == null) cap = scene.spawnIce(3);
+            // Provisional 2-tick correction; the real-server spike must establish the lowest stable frequency.
+            if (elapsed % 2 == 0 && t < 56) {
+                double vibration = t >= 43 ? Math.sin(t * 2.4) * 0.025 : 0;
+                scene.stabilizeIce(lower, vibration);
+                scene.stabilizeIce(middle, -vibration);
+                scene.stabilizeIce(upper, vibration);
+                scene.stabilizeIce(cap, -vibration);
             }
-            if (t == previousTick) return;
+            if (t == previousTick && FreezeTimeline.phase(t) != FreezeTimeline.Phase.HOLD) return;
             previousTick = t;
             switch (FreezeTimeline.phase(t)) {
                 case FREEZE:
@@ -91,7 +94,9 @@ public final class FreezeKill extends KillEffect {
                 case SHATTER:
                     if (t == 53) scene.sound(0.65f, 1.3f);
                     ring(Particle.ICE, 0.6 + (t - 53) * 0.28, 1 + (t - 53) * 0.08, 24);
+                    if (t >= 53) scene.destroy(cap);
                     if (t >= 54) scene.destroy(upper);
+                    if (t >= 55) scene.destroy(middle);
                     if (t >= 56) scene.destroy(lower);
                     if (t == 57) scene.status(body, (byte) 3);
                     break;

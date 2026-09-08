@@ -14,7 +14,10 @@ import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes;
 import com.github.retrooper.packetevents.protocol.particle.type.ParticleTypes;
 import com.github.retrooper.packetevents.protocol.particle.data.LegacyParticleData;
 import com.github.retrooper.packetevents.protocol.item.type.ItemTypes;
+import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.protocol.player.GameMode;
+import com.github.retrooper.packetevents.protocol.player.Equipment;
+import com.github.retrooper.packetevents.protocol.player.EquipmentSlot;
 import com.github.retrooper.packetevents.protocol.player.TextureProperty;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.protocol.player.UserProfile;
@@ -71,7 +74,7 @@ public final class PacketEventsKillEffectRenderer implements KillEffectRenderer 
             throw new IllegalStateException("An initialized PacketEvents 2.13.0 instance is required");
         }
         // Resolve protocol registries at startup, not in the middle of a death event.
-        if (EntityTypes.FALLING_BLOCK == null || ParticleTypes.BLOCK == null || ItemTypes.ICE == null) {
+        if (EntityTypes.ARMOR_STAND == null || ParticleTypes.BLOCK == null || ItemTypes.ICE == null) {
             throw new IllegalStateException("Required protocol registries unavailable");
         }
         PacketEvents.getAPI().getEventManager().registerListener(profiles);
@@ -136,10 +139,24 @@ public final class PacketEventsKillEffectRenderer implements KillEffectRenderer 
     }
 
     @Override
-    public void spawnFallingBlock(UUID viewer, int entity, double x, double y, double z, int blockId, int data) {
-        send(viewer, new WrapperPlayServerSpawnEntity(entity, Optional.empty(), EntityTypes.FALLING_BLOCK,
-                new Vector3d(x, y, z), 0, 0, 0, (blockId & 0xfff) | ((data & 0xf) << 12),
+    public void spawnArmorStand(UUID viewer, int entity, double x, double y, double z, float yaw) {
+        send(viewer, new WrapperPlayServerSpawnEntity(entity, Optional.empty(), EntityTypes.ARMOR_STAND,
+                new Vector3d(x, y, z), 0, yaw, yaw, 0,
                 Optional.of(new Vector3d(0, 0, 0))));
+    }
+
+    @Override
+    public void hideArmorStand(UUID viewer, int entity) {
+        send(viewer, new WrapperPlayServerEntityMetadata(entity,
+                Arrays.asList(new EntityData<>(0, EntityDataTypes.BYTE, (byte) 0x20),
+                        new EntityData<>(10, EntityDataTypes.BYTE, (byte) 0x18))));
+    }
+
+    @Override
+    public void equipIceHelmet(UUID viewer, int entity) {
+        ItemStack ice = ItemStack.builder().type(ItemTypes.ICE).amount(1).build();
+        send(viewer, new WrapperPlayServerEntityEquipment(entity,
+                Arrays.asList(new Equipment(EquipmentSlot.HELMET, ice))));
     }
 
     @Override

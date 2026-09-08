@@ -50,15 +50,16 @@ public class RuntimeLimitsTest {
         KillEffectSettings s = new KillEffectSettings(Collections.emptyMap());
         assertEquals(32, s.range); assertEquals(16, s.fullRange);
         assertEquals(12, s.maxGlobal); assertEquals(6, s.maxWorld); assertEquals(2, s.maxChunk);
-        assertEquals(100, s.maxDuration); assertEquals(12, s.maxEntities); assertEquals(100, s.cooldown);
+        assertEquals(200, s.maxDuration); assertEquals(17, s.maxEntities); assertEquals(100, s.cooldown);
         assertTrue(s.sounds); assertTrue(s.respectVanish); assertTrue(s.lite);
     }
 
     @Test
     public void fullAudienceAdmissionReservesStructuralSendsWithoutOverflow() {
-        assertTrue(CapacityPolicy.supportsFullAudience(170, 3000));
-        assertFalse(CapacityPolicy.supportsFullAudience(170, 3100));
-        assertFalse(CapacityPolicy.supportsFullAudience(171, 0));
+        assertTrue(CapacityPolicy.supportsFullAudience(46, 0));
+        assertTrue(CapacityPolicy.supportsFullAudience(24, 3000));
+        assertFalse(CapacityPolicy.supportsFullAudience(25, 3000));
+        assertFalse(CapacityPolicy.supportsFullAudience(47, 0));
         assertFalse(CapacityPolicy.supportsFullAudience(Integer.MAX_VALUE, 0));
         assertFalse(CapacityPolicy.supportsFullAudience(0, 0));
     }
@@ -78,6 +79,16 @@ public class RuntimeLimitsTest {
         KillEffectSettings s = new KillEffectSettings(values);
         assertEquals(4, s.range); assertEquals(4, s.fullRange);
         assertEquals(1, s.maxWorld); assertEquals(1, s.maxChunk);
-        assertEquals(1200, s.cooldown); assertEquals(100, s.maxDuration); assertEquals(12, s.maxEntities);
+        assertEquals(1200, s.cooldown); assertEquals(200, s.maxDuration); assertEquals(17, s.maxEntities);
+    }
+
+    @Test
+    public void previousLimitsCannotTruncateTheLargerLongerFreeze() {
+        Map<String, Object> values = new HashMap<>();
+        values.put("Kill-Effects-Settings.Max-Duration-Ticks", 100);
+        values.put("Kill-Effects-Settings.Max-Entities-Per-Scene", 12);
+        KillEffectSettings s = new KillEffectSettings(values);
+        assertEquals(160, s.maxDuration);
+        assertEquals(17, s.maxEntities);
     }
 }

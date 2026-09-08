@@ -13,7 +13,9 @@ public interface KillEffectRenderer extends AutoCloseable {
     void profile(UUID viewer, UUID profile, VictimSnapshot victim, boolean add);
     void spawnPlayer(UUID viewer, int entity, UUID profile, double x, double y, double z, float yaw, float pitch);
     void headRotation(UUID viewer, int entity, float yaw);
-    void spawnFallingBlock(UUID viewer, int entity, double x, double y, double z, int blockId, int data);
+    void spawnArmorStand(UUID viewer, int entity, double x, double y, double z, float yaw);
+    void hideArmorStand(UUID viewer, int entity);
+    void equipIceHelmet(UUID viewer, int entity);
     void teleportEntity(UUID viewer, int entity, double x, double y, double z, float yaw, float pitch);
     void stopEntityVelocity(UUID viewer, int entity);
     void playEntityStatus(UUID viewer, int entity, byte status);

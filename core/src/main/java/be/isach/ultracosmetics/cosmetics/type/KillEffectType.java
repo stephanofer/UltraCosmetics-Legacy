@@ -23,6 +23,6 @@ public final class KillEffectType extends CosmeticType<KillEffect> {
     @Override
     protected void setupConfig(CustomConfiguration config, String path) {
         super.setupConfig(config, path);
-        config.addDefault(path + ".Duration", 60);
+        config.addDefault(path + ".Duration", 120);
     }
 }

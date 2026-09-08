@@ -13,8 +13,9 @@ public final class KillEffectSettings {
         maxGlobal = number(config.get(p + "Max-Active-Global"), 12, 1, 24);
         maxWorld = number(config.get(p + "Max-Active-Per-World"), 6, 1, maxGlobal);
         maxChunk = number(config.get(p + "Max-Full-Effects-Per-Chunk"), 2, 1, maxWorld);
-        maxDuration = number(config.get(p + "Max-Duration-Ticks"), 100, 20, 100);
-        maxEntities = number(config.get(p + "Max-Entities-Per-Scene"), 12, 3, 12);
+        // Floors also protect existing configs: Freeze needs up to 160 ticks and 16 helmets plus a player.
+        maxDuration = number(config.get(p + "Max-Duration-Ticks"), 200, 160, 200);
+        maxEntities = number(config.get(p + "Max-Entities-Per-Scene"), 17, 17, 24);
         cooldown = number(config.get(p + "Preview-Cooldown"), 5, 1, 60) * 20;
         anchorSearch = number(config.get(p + "Anchor-Search-Distance"), 3, 0, 5);
         sounds = !Boolean.FALSE.equals(config.get(p + "Sounds"));

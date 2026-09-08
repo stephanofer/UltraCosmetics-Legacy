@@ -141,7 +141,7 @@ public final class KillEffectManager implements Listener {
             if (preview) ticker.stopPreview(killer.getUniqueId());
             KillEffectPosition position = position(anchor);
             CapacityPolicy.Detail detail = ticker.capacity(settings, position.world, position.chunkX(), position.chunkZ());
-            if (detail == CapacityPolicy.Detail.FULL && !airborne && !ticker.supportsFullAudience(audience.size())) {
+            if (detail == CapacityPolicy.Detail.FULL && !ticker.supportsFullAudience(audience.size())) {
                 detail = settings.lite ? CapacityPolicy.Detail.LITE : CapacityPolicy.Detail.SKIP;
             }
             if (detail == CapacityPolicy.Detail.SKIP) return false;
@@ -219,7 +219,7 @@ public final class KillEffectManager implements Listener {
     public void captureDeath(PlayerDeathEvent event) {
         if (closed || !Category.KILL_EFFECTS.isEnabled() || !realPlayer(event.getEntity())) return;
         try {
-            pendingDeaths.put(event, new CapturedDeath(captureVictim(event.getEntity()), event.getEntity().getLocation()));
+            pendingDeaths.put(event, new CapturedDeath(captureVictim(event.getEntity()), event.getEntity().getLocation().clone()));
         } catch (RuntimeException | LinkageError e) {
             plugin.getLogger().warning("Kill Effect death snapshot failed: " + e);
         }

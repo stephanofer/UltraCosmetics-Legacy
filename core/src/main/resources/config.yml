@@ -20,8 +20,10 @@ Kill-Effects-Settings:
   Max-Active-Global: 12
   Max-Active-Per-World: 6
   Max-Full-Effects-Per-Chunk: 2
-  Max-Duration-Ticks: 100
-  Max-Entities-Per-Scene: 12
+  # Clamped to 160-200 ticks so the complete Freeze animation can finish.
+  Max-Duration-Ticks: 200
+  # Clamped to 17-24 entities; Freeze uses sixteen ice helmets and one player replica.
+  Max-Entities-Per-Scene: 17
   Preview-Cooldown: 5
   Anchor-Search-Distance: 3
   Sounds: true

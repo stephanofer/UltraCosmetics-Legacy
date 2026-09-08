@@ -97,7 +97,9 @@ public final class KillEffectTicker implements Runnable {
     public boolean supportsFullAudience(int viewers) {
         int reserved = 0;
         for (Entry entry : active) {
-            if (!entry.scene.context.lite && !entry.scene.context.airborne) reserved += entry.scene.context.audience.size() * 6;
+            if (!entry.scene.context.lite) {
+                reserved += entry.scene.context.audience.size() * CapacityPolicy.FREEZE_SENDS_PER_VIEWER;
+            }
         }
         return CapacityPolicy.supportsFullAudience(viewers, reserved)
                 && budget.permits(0, CapacityPolicy.STRUCTURAL_SEND_RESERVE + viewers * 6);

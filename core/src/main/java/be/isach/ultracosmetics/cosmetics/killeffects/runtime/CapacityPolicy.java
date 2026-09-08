@@ -2,13 +2,15 @@ package be.isach.ultracosmetics.cosmetics.killeffects.runtime;
 
 public final class CapacityPolicy {
     public static final int STRUCTURAL_SEND_RESERVE = 4096;
+    // Four new stands (twelve packets) plus stabilizing all sixteen (thirty-two packets).
+    public static final int FREEZE_SENDS_PER_VIEWER = 44;
     public enum Detail { FULL, LITE, SKIP }
 
     private CapacityPolicy() { }
 
     public static boolean supportsFullAudience(int viewers, int reserved) {
-        return viewers > 0 && viewers <= 170 && reserved >= 0
-                && (long) reserved + (long) viewers * 6 <= STRUCTURAL_SEND_RESERVE;
+        return viewers > 0 && viewers <= 2048 / FREEZE_SENDS_PER_VIEWER && reserved >= 0
+                && (long) reserved + (long) viewers * FREEZE_SENDS_PER_VIEWER <= STRUCTURAL_SEND_RESERVE;
     }
 
     public static Detail decide(int global, int world, int chunkFull, int maxGlobal, int maxWorld, int maxChunk, boolean lite) {

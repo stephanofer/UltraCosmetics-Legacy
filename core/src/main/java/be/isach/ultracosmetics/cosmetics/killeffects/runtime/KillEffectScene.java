@@ -17,6 +17,9 @@ import java.util.logging.Logger;
 
 /** Owns setup, per-viewer delivery, and cleanup; effects never receive the raw renderer. */
 public final class KillEffectScene {
+    private static final double ICE_SIZE = 0.625;
+    // 1.8.9: living-render translation - armor-stand head pivot + helmet translation.
+    private static final double ICE_HEAD_CENTER = 1.5078125 - 0.0625 + 0.25;
     private static final class Viewer {
         final boolean full;
         final Set<Integer> entities = new HashSet<>();
@@ -35,6 +38,7 @@ public final class KillEffectScene {
     private final UUID[] audienceIds;
     private final int structuralReserve;
     private final Set<Integer> entities = new HashSet<>();
+    private final Map<Integer, double[]> iceOffsets = new LinkedHashMap<>();
     private final Set<Integer> quarantined = new HashSet<>();
     private boolean closed;
     private boolean playerSpawned;
@@ -50,7 +54,7 @@ public final class KillEffectScene {
         this.logger = logger;
         context.audience.forEach((id, full) -> viewers.put(id, new Viewer(full)));
         audienceIds = context.audience.keySet().toArray(new UUID[0]);
-        structuralReserve = context.lite || context.airborne ? 0 : audienceIds.length * 6;
+        structuralReserve = context.lite ? 0 : audienceIds.length * CapacityPolicy.FREEZE_SENDS_PER_VIEWER;
     }
 
     public void beginTick() {
@@ -114,38 +118,50 @@ public final class KillEffectScene {
             }
             UUID identity = profile;
             state.entities.add(id); // Track before sending so partial setup is always cleaned.
-            send(viewer, v -> renderer.spawnPlayer(v, id, identity, context.anchor.x, context.anchor.y, context.anchor.z,
-                    context.anchor.yaw, context.anchor.pitch));
-            send(viewer, v -> renderer.headRotation(v, id, context.anchor.yaw));
+            send(viewer, v -> renderer.spawnPlayer(v, id, identity, context.death.x, context.death.y, context.death.z,
+                    context.death.yaw, context.death.pitch));
+            send(viewer, v -> renderer.headRotation(v, id, context.death.yaw));
         }
         return id;
     }
 
-    public int spawnIce(double height) {
-        int id = allocate();
-        for (UUID viewer : audienceIds) {
-            Viewer state = viewers.get(viewer);
-            if (state == null) continue;
-            state.entities.add(id);
-            send(viewer, v -> renderer.spawnFallingBlock(v, id, context.anchor.x, context.anchor.y + height,
-                    context.anchor.z, 79, 0));
+    public int[] spawnIce(int layer) {
+        int[] ids = new int[4];
+        float yaw = context.death.yaw;
+        double angle = Math.toRadians(yaw);
+        for (int i = 0; i < ids.length; i++) {
+            int id = ids[i] = allocate();
+            // Adjacent helmet cubes share a face; every layer uses the same body-local axis.
+            double side = (i % 2 - 0.5) * ICE_SIZE;
+            double depth = (i / 2 - 0.5) * ICE_SIZE;
+            double dx = Math.cos(angle) * side - Math.sin(angle) * depth;
+            double dz = Math.sin(angle) * side + Math.cos(angle) * depth;
+            double dy = (layer + 0.5) * ICE_SIZE - ICE_HEAD_CENTER;
+            iceOffsets.put(id, new double[]{dx, dy, dz, yaw});
+            for (UUID viewer : audienceIds) {
+                Viewer state = viewers.get(viewer);
+                if (state == null) continue;
+                state.entities.add(id);
+                send(viewer, v -> renderer.spawnArmorStand(v, id, context.death.x + dx, context.death.y + dy,
+                        context.death.z + dz, yaw));
+                send(viewer, v -> renderer.hideArmorStand(v, id));
+                send(viewer, v -> renderer.equipIceHelmet(v, id));
+            }
         }
-        return id;
+        return ids;
     }
 
-    public void teleport(int id, double dx, double dy, double dz) {
-        if (!entities.contains(id)) return;
-        for (UUID viewer : audienceIds) {
-            send(viewer, v -> renderer.teleportEntity(v, id, context.anchor.x + dx, context.anchor.y + dy,
-                    context.anchor.z + dz, context.anchor.yaw, context.anchor.pitch));
+    public void stabilizeIce(int[] ids, double vibration) {
+        if (ids == null) return;
+        for (int id : ids) {
+            double[] offset = iceOffsets.get(id);
+            if (offset == null || !entities.contains(id)) continue;
+            for (UUID viewer : audienceIds) {
+                send(viewer, v -> renderer.teleportEntity(v, id, context.death.x + offset[0] + vibration,
+                        context.death.y + offset[1], context.death.z + offset[2], (float) offset[3], 0));
+                send(viewer, v -> renderer.stopEntityVelocity(v, id));
+            }
         }
-    }
-
-    public void stabilizeIce(int id, double dx, double dy) {
-        teleport(id, dx, dy, 0);
-        if (!entities.contains(id)) return;
-        // Teleports alone do not reset the falling block's accumulated client-side gravity.
-        for (UUID viewer : audienceIds) send(viewer, v -> renderer.stopEntityVelocity(v, id));
     }
 
     public void status(int id, byte status) {
@@ -178,11 +194,17 @@ public final class KillEffectScene {
 
     public void destroy(int id) {
         if (!entities.remove(id)) return;
+        iceOffsets.remove(id);
         for (UUID viewer : audienceIds) {
             Viewer state = viewers.get(viewer);
             if (state != null && state.entities.remove(id)) destroyFor(viewer, new int[]{id});
         }
         if (!quarantined.contains(id)) allocator.release(id);
+    }
+
+    public void destroy(int[] ids) {
+        if (ids == null) return;
+        for (int id : ids) destroy(id);
     }
 
     private void destroyFor(UUID viewer, int[] ids) {
@@ -218,6 +240,7 @@ public final class KillEffectScene {
         for (UUID viewer : audienceIds) removeViewer(viewer);
         for (int id : entities) if (!quarantined.contains(id)) allocator.release(id);
         entities.clear();
+        iceOffsets.clear();
     }
 
     public long getTotalSends() { return totalSends + cleanupSends; }
