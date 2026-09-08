@@ -25,7 +25,7 @@ dependencies {
     //api 'com.github.cryptomorin:XSeries:9.9.0'
     api fileTree(dir: '.', include: ['XSeries-*-datatags.jar'])
     implementation 'org.bstats:bstats-bukkit:3.0.2'
-    compileOnly 'net.luckperms:api:5.4'
+    compileOnly 'net.luckperms:api:5.5'
     compileOnly "me.lokka30:treasury-api:2.0.2-SNAPSHOT"
     compileOnly 'com.palmergames.bukkit.towny:towny:0.100.2.8'
     implementation 'com.zaxxer:HikariCP:4.0.3'
