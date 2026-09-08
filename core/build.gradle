@@ -30,7 +30,7 @@ dependencies {
     compileOnly 'com.palmergames.bukkit.towny:towny:0.100.2.8'
     implementation 'com.zaxxer:HikariCP:4.0.3'
     implementation 'net.wesjd:anvilgui:1.9.3-SNAPSHOT'
-    implementation 'me.gamercoder215:mobchip-bukkit:1.9.5-SNAPSHOT'
+    implementation 'me.gamercoder215:mobchip-bukkit:1.10.1-SNAPSHOT'
     compileOnly 'com.discordsrv:discordsrv:1.28.0'
     compileOnly 'me.soknight:peconomy:2.7.4-pre1'
     compileOnly 'com.github.retrooper:packetevents-spigot:2.13.0'
