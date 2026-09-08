@@ -1,0 +1,64 @@
+---
+title: Development Setup
+description: Setup PacketEvents
+---
+
+import {TabItem, Tabs, Code} from "@astrojs/starlight/components";
+import {expandVersions} from "../../../scripts/versions.ts";
+import codeDependencyMaven from '../../../assets/snippets/dependency_maven.xml?raw';
+import codeDependencyGradle from '../../../assets/snippets/dependency_gradle.kts?raw';
+
+## Maven and Gradle
+
+
+You can add PacketEvents as a dependency using [Apache Maven](https://maven.apache.org/)
+or [Gradle](https://gradle.org/) (recommended). These build tools can help you build your project, which may rely on
+various other dependencies, with ease. If you're new to Minecraft development, please choose a tool (we prefer Gradle)
+and familiarize yourself with it. We suggest you follow
+this [guide](https://docs.gradle.org/current/userguide/getting_started_eng.html).
+
+## Modules
+
+PacketEvents supports multiple Minecraft platforms, so you'll have to specify which one you're targeting. Here are the
+modules that we support:
+
+### Supported Modules
+
+- `spigot`
+- `velocity`
+- `bungeecord`
+- `fabric`
+- `sponge`
+
+## Maven/Gradle Buildscript
+
+<Tabs>
+    <TabItem label={"Maven"}>
+        <Code
+            code={expandVersions(codeDependencyMaven)}
+            del={"INSERT_MODULE_HERE"}
+            title={"pom.xml"}
+            lang={"xml"}
+        />
+    </TabItem>
+    <TabItem label={"Gradle"}>
+        <Code
+            code={expandVersions(codeDependencyGradle)}
+            del={"INSERT_MODULE_HERE"}
+            title={"build.gradle[.kts]"}
+            lang={"kt"}
+        />
+    </TabItem>
+</Tabs>
+
+:::caution[Warning]
+The Maven/Gradle code sections above include the placeholder <span style={{color: "var(--red-700)"}}>**'INSERT_MODULE_HERE'**</span>;
+please replace it with one of the supported modules.
+:::
+
+:::note[Hint]
+The supported modules are also tested to work on widely-used forks. For instance, the 'spigot' module is designed to
+work on (but not limited to) the following forks: _Paper_, _Purpur_, _Folia_. The 'bungeecord' module should work
+on (but not limited to) _Waterfall_. If you encounter issues with a widely-used fork of a platform, please report
+it as an issue on our [GitHub repository](http://github.com/retrooper/packetevents/issues).
+:::

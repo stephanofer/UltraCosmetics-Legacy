@@ -80,6 +80,10 @@ dependencies {
     }
 }
 
+jar {
+    dependsOn ':core:jar'
+}
+
 subprojects { subproj ->
     repositories {
         mavenLocal()
@@ -130,10 +134,12 @@ subprojects { subproj ->
             url = 'https://nexus.scarsz.me/content/groups/public/'
         }
 
-        // ChestSort
+        // PacketEvents
         maven {
-            url = 'https://repo.jeff-media.com/public'
+            url = 'https://repo.codemc.io/repository/maven-releases/'
         }
+
+
 
         // Towny
         maven {
@@ -207,4 +213,20 @@ abstract class VersionedObfTask extends DefaultTask {
 tasks.register("obfuscate") {
     dependsOn tasks.withType(VersionedObfTask)
     group = 'jar preparation'
+}
+
+tasks.register("verifyPacketEventsNotBundled") {
+    dependsOn jar
+    description 'Verifies that the externally installed PacketEvents runtime is not bundled.'
+    group = 'verification'
+
+    doLast {
+        def packetEventsClasses = zipTree(tasks.jar.archiveFile.get().asFile).matching {
+            include 'com/github/retrooper/**'
+            include 'io/github/retrooper/**'
+        }.files
+        if (!packetEventsClasses.empty) {
+            throw new GradleException('PacketEvents classes must not be bundled in UltraCosmetics.')
+        }
+    }
 }

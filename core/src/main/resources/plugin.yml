@@ -17,6 +17,7 @@ softdepend:
   - Towny
   - PEconomy
   - PlayerAuctions
+  - packetevents
 commands:
   ultracosmetics:
     aliases: [ uc, cosmetics ]
