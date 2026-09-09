@@ -34,10 +34,10 @@ dependencies {
     compileOnly 'com.discordsrv:discordsrv:1.28.0'
     compileOnly 'me.soknight:peconomy:2.7.4-pre1'
     compileOnly 'com.github.retrooper:packetevents-spigot:2.13.0'
-    implementation "net.kyori:adventure-text-minimessage:4.17.0"
+    implementation "net.kyori:adventure-text-minimessage:5.2.0"
     implementation "net.kyori:adventure-platform-bukkit:4.3.2"
-    implementation "net.kyori:adventure-text-serializer-plain:4.17.0"
-    api "net.kyori:adventure-api:4.17.0"
+    implementation "net.kyori:adventure-text-serializer-plain:5.2.0"
+    api "net.kyori:adventure-api:5.2.0"
     compileOnly "com.olziedev:playerauctions-api:1.28.1"
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'org.spigotmc:spigot-api:1.20.3-R0.1-SNAPSHOT'
