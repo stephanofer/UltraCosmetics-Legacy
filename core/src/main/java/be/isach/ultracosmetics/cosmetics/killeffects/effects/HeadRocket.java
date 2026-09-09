@@ -39,10 +39,19 @@ public final class HeadRocket extends KillEffect {
                                 Math.cos(angle) * 0.13, height - 0.4 - i * 0.13, Math.sin(angle) * 0.13, i);
                     }
                 }
-                if (at(45)) { removeVictim(); climax(Sound.BLAST, height, 1.3f); }
+                if (at(45)) {
+                    removeVictim();
+                    climax(Sound.EXPLOSION, height, 0.75f);
+                    sound(Sound.BLAST, height, 0.8f, 1.1f);
+                    burst(Particle.WHITE, 0, height, 0, 0.55, 0);
+                    ring(Particle.FLAME, 0.65, height);
+                }
+                if (at(48)) sound(Sound.TWINKLE, height, 0.45f, 0.9f);
                 if (t >= 45 && t < 58) {
                     double u = progress(t, 45, 58);
-                    burst(t < 50 ? Particle.GOLD : Particle.SPARK, 0, height, 0, 0.15 + 1.5 * smooth(u), 0.7 * u * u);
+                    double expansion = 1 - (1 - u) * (1 - u);
+                    burst(t < 50 ? Particle.GOLD : Particle.SPARK, 0, height, 0, 0.35 + 2.1 * expansion, 0.7 * u * u);
+                    if (t < 51) ring(Particle.CLOUD, 0.45 + 2.3 * expansion, height);
                 }
             }
         };

@@ -8,7 +8,7 @@ import java.util.UUID;
 /** Each rendering method sends exactly one packet to one viewer. */
 public interface KillEffectRenderer extends AutoCloseable {
     enum Particle { SNOW, ICE, CYAN, CLOUD, FLAME, SMOKE, SPARK, PORTAL, RED, RED_FRAGMENT, GOLD, WHITE }
-    enum Sound { IGNITE, LAUNCH, POP, BLAST, PORTAL, THUNDER, CHIME, FIZZ }
+    enum Sound { IGNITE, LAUNCH, POP, BLAST, PORTAL, THUNDER, CHIME, FIZZ, EXPLOSION, TWINKLE }
     final class NameTag {
         public final String prefix;
         public final String suffix;

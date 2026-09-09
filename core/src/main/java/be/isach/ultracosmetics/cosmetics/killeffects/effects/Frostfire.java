@@ -28,12 +28,19 @@ public final class Frostfire extends KillEffect {
                     helix(Particle.FLAME, t, radius, 0.1, height, Math.PI);
                     if (at(30)) { if (!lite) scene.status(subject, (byte) 2); sound(Sound.FIZZ, 1.5, 0.35f, 1.4f); }
                 }
-                if (at(42)) { removeVictim(); climax(Sound.FIZZ, 1.5, 0.65f); }
+                if (at(42)) {
+                    removeVictim();
+                    climax(Sound.EXPLOSION, 1.5, 0.85f);
+                    sound(Sound.FIZZ, 1.5, 0.6f, 0.65f);
+                    burst(Particle.WHITE, 0, 1.4, 0, 0.45, 0);
+                    burst(Particle.ICE, 0, 1.4, 0, 0.65, 0);
+                }
                 if (t >= 42 && t < 56) {
                     double u = progress(t, 42, 56);
-                    ring(Particle.CYAN, 0.15 + 1.65 * smooth(u), 1.35 + u * 0.15);
-                    ring(Particle.FLAME, 0.15 + 1.65 * smooth(u), 1.35 - u * 0.15);
-                    if (elapsed % 3 == 0) burst(Particle.CLOUD, 0, 1.4, 0, u * 0.6, 0);
+                    double expansion = 1 - (1 - u) * (1 - u);
+                    ring(Particle.CYAN, 0.3 + 1.85 * expansion, 1.35 + u * 0.2);
+                    ring(Particle.FLAME, 0.3 + 1.85 * expansion, 1.35 - u * 0.2);
+                    if (elapsed % 3 == 0) burst(Particle.CLOUD, 0, 1.4, 0, 0.25 + expansion * 0.85, 0);
                 }
             }
         };

@@ -387,6 +387,8 @@ public final class PacketEventsKillEffectRenderer implements KillEffectRenderer 
             case LAUNCH: name = "fireworks.launch"; break;
             case POP: name = "mob.chicken.plop"; break;
             case BLAST: name = "fireworks.blast"; break;
+            case EXPLOSION: name = "random.explode"; break;
+            case TWINKLE: name = "fireworks.twinkle"; break;
             case PORTAL: name = "portal.trigger"; break;
             case THUNDER: name = "ambient.weather.thunder"; break;
             case CHIME: name = "note.pling"; break;

@@ -37,8 +37,12 @@ abstract class CatalogExecution extends AbstractKillEffectExecution {
     private double time;
 
     CatalogExecution(KillEffectContext context, KillEffectScene scene, KillEffectType type) {
-        this(context, scene, context.lite ? 30 : KillEffectSettings.clamp(
-                SettingsManager.getConfig().getInt(type.getConfigPath() + ".Duration", 64), 60, 80));
+        this(context, scene, type, 0);
+    }
+
+    CatalogExecution(KillEffectContext context, KillEffectScene scene, KillEffectType type, int extraTicks) {
+        this(context, scene, context.lite ? 30 + extraTicks / 2 : KillEffectSettings.clamp(
+                SettingsManager.getConfig().getInt(type.getConfigPath() + ".Duration", 64), 60, 80) + extraTicks);
     }
 
     private CatalogExecution(KillEffectContext context, KillEffectScene scene, int duration) {
