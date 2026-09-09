@@ -95,13 +95,16 @@ public final class KillEffectTicker implements Runnable {
     }
 
     public boolean supportsFullAudience(int viewers) {
+        return supportsAudience(viewers, CapacityPolicy.FREEZE_SENDS_PER_VIEWER);
+    }
+
+    public boolean supportsAudience(int viewers, int sendsPerViewer) {
         int reserved = 0;
         for (Entry entry : active) {
-            if (!entry.scene.context.lite) {
-                reserved += entry.scene.context.audience.size() * CapacityPolicy.FREEZE_SENDS_PER_VIEWER;
-            }
+            reserved += entry.scene.getStructuralReserve();
         }
-        return CapacityPolicy.supportsFullAudience(viewers, reserved)
+        return viewers > 0 && (long) viewers * sendsPerViewer <= 2048
+                && reserved + (long) viewers * sendsPerViewer <= CapacityPolicy.STRUCTURAL_SEND_RESERVE
                 && budget.permits(0, CapacityPolicy.STRUCTURAL_SEND_RESERVE + viewers * 6);
     }
 

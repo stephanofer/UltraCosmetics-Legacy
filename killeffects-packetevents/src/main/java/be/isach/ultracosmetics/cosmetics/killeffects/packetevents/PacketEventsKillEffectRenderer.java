@@ -15,6 +15,10 @@ import com.github.retrooper.packetevents.protocol.particle.type.ParticleTypes;
 import com.github.retrooper.packetevents.protocol.particle.data.LegacyParticleData;
 import com.github.retrooper.packetevents.protocol.item.type.ItemTypes;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
+import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
+import com.github.retrooper.packetevents.protocol.nbt.NBTList;
+import com.github.retrooper.packetevents.protocol.nbt.NBTString;
+import com.github.retrooper.packetevents.protocol.nbt.NBTType;
 import com.github.retrooper.packetevents.protocol.player.GameMode;
 import com.github.retrooper.packetevents.protocol.player.Equipment;
 import com.github.retrooper.packetevents.protocol.player.EquipmentSlot;
@@ -36,6 +40,7 @@ import org.bukkit.plugin.Plugin;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -79,7 +84,8 @@ public final class PacketEventsKillEffectRenderer implements KillEffectRenderer 
             throw new IllegalStateException("An initialized PacketEvents 2.13.0 instance is required");
         }
         // Resolve protocol registries at startup, not in the middle of a death event.
-        if (EntityTypes.ARMOR_STAND == null || ParticleTypes.BLOCK == null || ItemTypes.ICE == null) {
+        if (EntityTypes.ARMOR_STAND == null || ParticleTypes.BLOCK == null || ItemTypes.ICE == null
+                || ItemTypes.SKELETON_SKULL == null) {
             throw new IllegalStateException("Required protocol registries unavailable");
         }
         tabNameTags = TabNameTags.create();
@@ -102,15 +108,79 @@ public final class PacketEventsKillEffectRenderer implements KillEffectRenderer 
         knownProfiles.clear();
     }
 
+    private Method profileMethod;
+    private Method propertiesMethod;
+    private Method propertyMapGetMethod;
+    private Method propertyValueMethod;
+    private Method propertySignatureMethod;
+
+    private List<VictimSnapshot.SkinProperty> extractSkinFromGameProfile(Player player) {
+        if (player == null) return Collections.emptyList();
+        try {
+            if (profileMethod == null) {
+                profileMethod = player.getClass().getMethod("getProfile");
+            }
+            Object profile = profileMethod.invoke(player);
+            if (profile == null) return Collections.emptyList();
+
+            if (propertiesMethod == null) {
+                propertiesMethod = profile.getClass().getMethod("getProperties");
+            }
+            Object propertyMap = propertiesMethod.invoke(profile);
+            if (propertyMap == null) return Collections.emptyList();
+
+            if (propertyMapGetMethod == null) {
+                propertyMapGetMethod = propertyMap.getClass().getMethod("get", Object.class);
+            }
+            Collection<?> textures = (Collection<?>) propertyMapGetMethod.invoke(propertyMap, "textures");
+            if (textures == null || textures.isEmpty()) return Collections.emptyList();
+
+            List<VictimSnapshot.SkinProperty> properties = new ArrayList<>(textures.size());
+            for (Object prop : textures) {
+                if (prop == null) continue;
+                if (propertyValueMethod == null) {
+                    propertyValueMethod = prop.getClass().getMethod("getValue");
+                }
+                String value = (String) propertyValueMethod.invoke(prop);
+                String signature = null;
+                try {
+                    if (propertySignatureMethod == null) {
+                        propertySignatureMethod = prop.getClass().getMethod("getSignature");
+                    }
+                    signature = (String) propertySignatureMethod.invoke(prop);
+                } catch (NoSuchMethodException ignored) {
+                }
+                if (value != null && !value.isEmpty()) {
+                    properties.add(new VictimSnapshot.SkinProperty("textures", value, signature));
+                }
+            }
+            return properties;
+        } catch (Throwable ignored) {
+            return Collections.emptyList();
+        }
+    }
+
     @Override
     public List<VictimSnapshot.SkinProperty> captureSkin(Player player) {
-        User user = PacketEvents.getAPI().getPlayerManager().getUser(player);
-        if (user == null) throw new IllegalStateException("Player connection is not ready");
-        List<VictimSnapshot.SkinProperty> skin = new ArrayList<>();
-        for (TextureProperty property : user.getProfile().getTextureProperties()) {
-            skin.add(new VictimSnapshot.SkinProperty(property.getName(), property.getValue(), property.getSignature()));
+        // 1. Primary: Extract from Bukkit/Spigot GameProfile (contains SkinsRestorer, Velocity, online & offline skins).
+        List<VictimSnapshot.SkinProperty> fromGameProfile = extractSkinFromGameProfile(player);
+        if (!fromGameProfile.isEmpty()) {
+            return fromGameProfile;
         }
-        return skin;
+
+        // 2. Fallback: Query PacketEvents User connection profile if Bukkit GameProfile had no textures.
+        User user = PacketEvents.getAPI().getPlayerManager().getUser(player);
+        if (user != null) {
+            List<VictimSnapshot.SkinProperty> fromPacketEvents = new ArrayList<>();
+            for (TextureProperty property : user.getProfile().getTextureProperties()) {
+                fromPacketEvents.add(new VictimSnapshot.SkinProperty(property.getName(), property.getValue(), property.getSignature()));
+            }
+            if (!fromPacketEvents.isEmpty()) {
+                return fromPacketEvents;
+            }
+        }
+
+        return Collections.emptyList();
     }
 
     @Override
@@ -180,10 +250,52 @@ public final class PacketEventsKillEffectRenderer implements KillEffectRenderer 
     }
 
     @Override
+    public void hideFloatingHeadStand(UUID viewer, int entity) {
+        // Legacy index 10: no gravity (0x02), no base plate (0x08), marker (0x10).
+        // Modern entity-level NoGravity metadata is not a 1.8 protocol field.
+        send(viewer, new WrapperPlayServerEntityMetadata(entity,
+                Arrays.asList(new EntityData<>(0, EntityDataTypes.BYTE, (byte) 0x20),
+                        new EntityData<>(10, EntityDataTypes.BYTE, (byte) 0x1a))));
+    }
+
+    @Override
     public void equipIceHelmet(UUID viewer, int entity) {
         ItemStack ice = ItemStack.builder().type(ItemTypes.ICE).amount(1).build();
         send(viewer, new WrapperPlayServerEntityEquipment(entity,
                 Arrays.asList(new Equipment(EquipmentSlot.HELMET, ice))));
+    }
+
+    @Override
+    public void equipVictimHead(UUID viewer, int entity, VictimSnapshot victim) {
+        NBTCompound owner = new NBTCompound();
+        owner.setTag("Id", new NBTString(victim.uuid.toString()));
+        owner.setTag("Name", new NBTString(victim.name));
+        NBTList<NBTCompound> textures = new NBTList<>(NBTType.COMPOUND);
+        for (VictimSnapshot.SkinProperty property : victim.skin) {
+            if (!"textures".equals(property.name)) continue;
+            NBTCompound texture = new NBTCompound();
+            texture.setTag("Value", new NBTString(property.value));
+            if (property.signature != null) texture.setTag("Signature", new NBTString(property.signature));
+            textures.addTag(texture);
+        }
+        NBTCompound properties = new NBTCompound();
+        properties.setTag("textures", textures);
+        owner.setTag("Properties", properties);
+        NBTCompound tag = new NBTCompound();
+        tag.setTag("SkullOwner", owner);
+        // In 1.8 protocol registries, skull item 397 is mapped to SKELETON_SKULL with damage=3 (PLAYER_HEAD has no pre-1.13 ID).
+        ItemStack head = ItemStack.builder().type(ItemTypes.SKELETON_SKULL).legacyData(3).amount(1).nbt(tag).build();
+        send(viewer, new WrapperPlayServerEntityEquipment(entity,
+                Collections.singletonList(new Equipment(EquipmentSlot.HELMET, head))));
+    }
+
+    @Override
+    public void spawnSquid(UUID viewer, int entity, double x, double y, double z, float yaw) {
+        send(viewer, new WrapperPlayServerSpawnLivingEntity(entity, UUID.randomUUID(), EntityTypes.SQUID,
+                new Vector3d(x, y, z), yaw, 0, yaw, new Vector3d(0, 0, 0),
+                Arrays.asList(new EntityData<>(0, EntityDataTypes.BYTE, (byte) 0),
+                        new EntityData<>(6, EntityDataTypes.FLOAT, 10f),
+                        new EntityData<>(15, EntityDataTypes.BYTE, (byte) 1))));
     }
 
     @Override
@@ -214,6 +326,31 @@ public final class PacketEventsKillEffectRenderer implements KillEffectRenderer 
         float speed = 0;
         int count = 1;
         switch (particle) {
+            case FLAME:
+                value = new com.github.retrooper.packetevents.protocol.particle.Particle<>(ParticleTypes.FLAME);
+                break;
+            case SMOKE:
+                value = new com.github.retrooper.packetevents.protocol.particle.Particle<>(ParticleTypes.SMOKE);
+                break;
+            case SPARK:
+                value = new com.github.retrooper.packetevents.protocol.particle.Particle<>(ParticleTypes.FIREWORK);
+                break;
+            case PORTAL:
+                value = new com.github.retrooper.packetevents.protocol.particle.Particle<>(ParticleTypes.PORTAL);
+                break;
+            case RED_FRAGMENT:
+                value = new com.github.retrooper.packetevents.protocol.particle.Particle(ParticleTypes.BLOCK,
+                        LegacyParticleData.ofBlock(ItemTypes.REDSTONE_BLOCK, (byte) 0));
+                break;
+            case RED:
+            case GOLD:
+            case WHITE:
+                value = new com.github.retrooper.packetevents.protocol.particle.Particle<>(ParticleTypes.DUST);
+                offset = particle == Particle.RED ? new Vector3f(1f, 0.03f, 0.08f)
+                        : particle == Particle.GOLD ? new Vector3f(1f, 0.7f, 0.08f) : new Vector3f(1f, 1f, 1f);
+                speed = 1;
+                count = 0;
+                break;
             case ICE:
                 // The registry's generic data type is modern. 1.8 requires id | (metadata << 12),
                 // not WrappedBlockState's palette ID (id << 4 | metadata).
@@ -240,6 +377,23 @@ public final class PacketEventsKillEffectRenderer implements KillEffectRenderer 
     public void playSound(UUID viewer, double x, double y, double z, float volume, float pitch) {
         send(viewer, new WrapperPlayServerSoundEffect(GLASS_BREAK, SoundCategory.PLAYER,
                 new Vector3d(x, y, z), volume, pitch, 0L));
+    }
+
+    @Override
+    public void playSound(UUID viewer, Sound sound, double x, double y, double z, float volume, float pitch) {
+        String name;
+        switch (sound) {
+            case IGNITE: name = "fire.ignite"; break;
+            case LAUNCH: name = "fireworks.launch"; break;
+            case POP: name = "mob.chicken.plop"; break;
+            case BLAST: name = "fireworks.blast"; break;
+            case PORTAL: name = "portal.trigger"; break;
+            case THUNDER: name = "ambient.weather.thunder"; break;
+            case CHIME: name = "note.pling"; break;
+            default: name = "random.fizz"; break;
+        }
+        send(viewer, new WrapperPlayServerSoundEffect(new StaticSound(new ResourceLocation(name), null),
+                SoundCategory.PLAYER, new Vector3d(x, y, z), volume, pitch, 0L));
     }
 
     @Override

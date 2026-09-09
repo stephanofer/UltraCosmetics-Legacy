@@ -624,11 +624,17 @@ public class UltraCosmetics extends JavaPlugin {
     }
 
     private void configMigration() {
-        Map<String, String> killCategoryPaths = new HashMap<>();
+        Map<String, String> killCategoryPaths = new java.util.LinkedHashMap<>();
         killCategoryPaths.put("Categories-Enabled.Death-Effects", "Categories-Enabled.Kill-Effects");
         killCategoryPaths.put("Categories.Death-Effects.Main-Menu-Item", "Categories.Kill-Effects.Main-Menu-Item");
         killCategoryPaths.put("Categories.Death-Effects.Go-Back-Arrow", "Categories.Kill-Effects.Go-Back-Arrow");
         Map<String, Object> existing = config.getValues(true);
+        // Old category first, then new-category aliases; explicit canonical paths always win.
+        for (String path : new java.util.TreeSet<>(existing.keySet())) {
+            if (config.isConfigurationSection(path)) continue;
+            String target = KillEffectMigration.catalogPath(path);
+            if (!target.equals(path)) killCategoryPaths.put(path, target);
+        }
         KillEffectMigration.missingSettings(existing, existing, killCategoryPaths).forEach(config::set);
         ConfigurationSection oldSQL = SettingsManager.getConfig().getConfigurationSection("Ammo-System-For-Gadgets.MySQL");
         if (oldSQL != null) {

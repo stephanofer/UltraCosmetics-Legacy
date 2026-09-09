@@ -460,6 +460,8 @@ When no safe anchor exists, including void deaths, run a reduced airborne Freeze
 
 Quality is more important than quantity. The initial release contains eight distinct, polished effects.
 
+**Block 2 implementation update (2026-09-09):** the seven additional effects are implemented and await owner-run compilation and real-server validation. Their full variants default to 64 ticks, with `Duration` clamped to 60–80 ticks; lite variants last 30 ticks. Every new full and lite variant includes a victim replica, textured victim head, or squid transformation. Particle-only lite signatures are not used for these seven effects. Freeze remains the previously validated baseline. Implementation details and pending release evidence are tracked in [`KILL_EFFECTS_BLOCK_2.md`](KILL_EFFECTS_BLOCK_2.md).
+
 | Effect | Direction |
 |---|---|
 | Freeze Kill | Victim replica is frozen inside traversable ice, held, cracked, and shattered |
@@ -488,6 +490,8 @@ Future candidates, not part of the first delivery:
 | Lightning | Divine Judgment | Preserve old `Lightning` identity as an alias |
 
 The final display names can improve while stable aliases continue resolving old configuration, unlock, and permission data.
+
+The Block 2 public keys are `Bloodburst`, `FireworkFinale`, and `DivineJudgment`. Their stable storage names remain `Explosion`, `Firework`, and `Lightning`, respectively, under the historical `death_effects` category. Input parsing recognizes both identities. Configuration leaf migration preserves explicit canonical destination values. Customized legacy messages are carried forward when their destination is absent; stock legacy copy is replaced by the new catalog defaults.
 
 ## Visual Design Rules
 
@@ -593,6 +597,8 @@ When full-detail capacity is exhausted, play the selected effect's lite signatur
 
 If even lite capacity is unavailable, skip the scene safely without affecting the death event.
 
+For the seven Block 2 effects, lite scenes explicitly budget one short-lived subject entity. Structural admission reserves four sends per viewer for lite scenes and eight for full scenes, and counts those reservations alongside active Freeze scenes. If the subject cannot be admitted, skip rather than silently replacing it with particles. Actual particle delivery still uses the shared point and send budgets.
+
 ## Configuration
 
 Keep shared runtime controls separate from cosmetic definitions:
@@ -669,6 +675,8 @@ Migration must be idempotent. Running it again must not duplicate entries, overw
 - No real entity or block rollback is required.
 
 ## Automated Testing Policy
+
+**Block 2 owner override (2026-09-09):** do not add automated tests for the seven new effects or their catalog-specific mathematics. Validate and tune them manually on the real server. Existing platform tests remain in place. The implementation agent does not execute Gradle, compilation, packaging, or tests for this block; the owner runs the necessary commands. The historical policy below continues to describe the established platform coverage, not an obligation to add Block 2 tests.
 
 Use JUnit 4.13.2 only for deterministic, isolated unit tests that do not require a Minecraft server.
 

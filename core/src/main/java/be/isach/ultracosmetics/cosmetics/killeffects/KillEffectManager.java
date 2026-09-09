@@ -146,14 +146,17 @@ public final class KillEffectManager implements Listener {
             if (preview) ticker.stopPreview(killer.getUniqueId());
             KillEffectPosition position = position(anchor);
             CapacityPolicy.Detail detail = ticker.capacity(settings, position.world, position.chunkX(), position.chunkZ());
-            if (detail == CapacityPolicy.Detail.FULL && !ticker.supportsFullAudience(audience.size())) {
+            KillEffectType type = selection.getType();
+            if (detail == CapacityPolicy.Detail.FULL && !ticker.supportsAudience(audience.size(), type.structuralSendsPerViewer(false))) {
                 detail = settings.lite ? CapacityPolicy.Detail.LITE : CapacityPolicy.Detail.SKIP;
             }
             if (detail == CapacityPolicy.Detail.SKIP) return false;
+            int structuralSends = type.structuralSendsPerViewer(detail == CapacityPolicy.Detail.LITE);
+            if (structuralSends > 0 && !ticker.supportsAudience(audience.size(), structuralSends)) return false;
             KillEffectContext context = new KillEffectContext(killer.getUniqueId(), killer.getName(), victim, position(location), position,
                     audience, victim.uuid.getLeastSignificantBits() ^ tick ^ killer.getUniqueId().getMostSignificantBits(), tick,
                     preview, airborne, detail == CapacityPolicy.Detail.LITE);
-            scene = new KillEffectScene(context, renderer, ENTITY_IDS, settings, ticker.budget, plugin.getLogger());
+            scene = new KillEffectScene(context, renderer, ENTITY_IDS, settings, ticker.budget, plugin.getLogger(), structuralSends);
             boolean started = ticker.add(scene, selection.createExecution(context, scene));
             if (started && !preview) deaths.put(victim.uuid, tick);
             return started;

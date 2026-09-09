@@ -2,6 +2,7 @@ package be.isach.ultracosmetics.config;
 
 import be.isach.ultracosmetics.UltraCosmeticsData;
 import be.isach.ultracosmetics.cosmetics.Category;
+import be.isach.ultracosmetics.cosmetics.killeffects.compatibility.KillEffectMigration;
 import be.isach.ultracosmetics.cosmetics.type.CosmeticType;
 import be.isach.ultracosmetics.util.SmartLogger;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
@@ -52,7 +53,18 @@ public class MessageManager {
         }
 
         Reader reader = UltraCosmeticsData.get().getPlugin().getFileReader("messages/" + langFile + ".yml");
-        loadMessages(YamlConfiguration.loadConfiguration(reader));
+        YamlConfiguration languageDefaults = YamlConfiguration.loadConfiguration(reader);
+        loadMessages(languageDefaults);
+        // Carry customized legacy copy forward, but let redesigned effects receive their new defaults.
+        for (String key : new ArrayList<>(messagesConfig.fileConfiguration.getKeys(true))) {
+            if (!messagesConfig.fileConfiguration.isString(key)) continue;
+            String target = KillEffectMigration.catalogPath(key);
+            String value = messagesConfig.getString(key);
+            if (!target.equals(key) && !messagesConfig.fileConfiguration.contains(target)
+                    && !value.equals(languageDefaults.getString(key))) {
+                messagesConfig.set(target, value.replace("<death-effectname>", "<kill-effectname>"));
+            }
+        }
         // Shared English defaults until the new category is translated; local overrides always win.
         try (Reader killEffects = UltraCosmeticsData.get().getPlugin().getFileReader("messages/killeffects.yml")) {
             YamlConfiguration defaults = YamlConfiguration.loadConfiguration(killEffects);

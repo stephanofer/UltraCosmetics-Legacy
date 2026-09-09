@@ -88,7 +88,7 @@ public abstract class Table {
     }
 
     public static String cleanCosmeticName(CosmeticType<?> cosmetic) {
-        return cosmetic == null ? null : cosmetic.getConfigName().toLowerCase();
+        return cosmetic == null ? null : cosmetic.getStorageName().toLowerCase(java.util.Locale.ROOT);
     }
 
     public static String cleanCategoryName(Category cat) {

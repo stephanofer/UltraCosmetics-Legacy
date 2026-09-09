@@ -32,4 +32,13 @@ public final class KillEffectMigration {
         });
         return additions;
     }
+
+    /** Translate leaf paths only; copying sections would overwrite explicit destination children. */
+    public static String catalogPath(String path) {
+        String result = path.replace("Death-Effects", "Kill-Effects");
+        result = result.replace("Kill-Effects.Explosion.", "Kill-Effects.Bloodburst.")
+                .replace("Kill-Effects.Firework.", "Kill-Effects.FireworkFinale.")
+                .replace("Kill-Effects.Lightning.", "Kill-Effects.DivineJudgment.");
+        return result;
+    }
 }

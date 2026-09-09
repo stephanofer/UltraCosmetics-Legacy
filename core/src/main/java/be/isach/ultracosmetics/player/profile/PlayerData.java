@@ -182,9 +182,9 @@ public class PlayerData {
             CosmeticType<?> type = enabledCosmetics.get(cat);
             String key = "enabled." + cat.getStorageId();
             String previous = data.getString(key);
-            // Keep selections whose Block 2 replacement has not been registered yet.
+            // Preserve unrecognized selections rather than silently deleting stored data.
             if (cat == Category.KILL_EFFECTS && type == null && previous != null && cat.valueOfType(previous) == null) continue;
-            data.set(key, type == null ? null : type.getConfigName().toLowerCase());
+            data.set(key, type == null ? null : type.getStorageName().toLowerCase(java.util.Locale.ROOT));
         }
 
         for (Entry<PetType, String> entry : petNames.entrySet()) {
@@ -199,7 +199,7 @@ public class PlayerData {
         }
 
         List<String> unlocked = new ArrayList<>(unresolvedUnlocks);
-        unlockedCosmetics.forEach(k -> unlocked.add(k.getCategory().getStorageId().toUpperCase(java.util.Locale.ROOT) + ":" + k.getConfigName()));
+        unlockedCosmetics.forEach(k -> unlocked.add(k.getCategory().getStorageId().toUpperCase(java.util.Locale.ROOT) + ":" + k.getStorageName()));
         data.set(ProfileKey.UNLOCKED.getFileKey(), unlocked);
         data.save();
     }

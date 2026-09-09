@@ -69,6 +69,8 @@ public abstract class CosmeticType<T extends Cosmetic<?>> {
 
     @SuppressWarnings("unchecked")
     public static <V extends CosmeticType<?>> V valueOf(Category cat, String name) {
+        if (cat == Category.DEATH_EFFECTS) cat = Category.KILL_EFFECTS;
+        if (cat == Category.KILL_EFFECTS) name = KillEffectType.canonicalName(name);
         for (CosmeticType<?> type : valuesOf(cat)) {
             if (type.getConfigName().equalsIgnoreCase(name)) {
                 return (V) type;
@@ -182,6 +184,11 @@ public abstract class CosmeticType<T extends Cosmetic<?>> {
     }
 
     public String getConfigName() {
+        return configName;
+    }
+
+    /** Stable persistence identity, independent of public catalog naming. */
+    public String getStorageName() {
         return configName;
     }
 

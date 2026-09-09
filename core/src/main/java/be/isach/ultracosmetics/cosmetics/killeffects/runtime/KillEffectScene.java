@@ -20,6 +20,8 @@ public final class KillEffectScene {
     private static final double ICE_SIZE = 0.625;
     // 1.8.9: living-render translation - armor-stand head pivot + helmet translation.
     private static final double ICE_HEAD_CENTER = 1.5078125 - 0.0625 + 0.25;
+    // Skull helmets use the legacy skull renderer's 1.1875 scale, not block-helmet translation.
+    private static final double SKULL_HEAD_CENTER = 1.5078125 - 0.0625 + 1.1875 * 0.25;
     private static final class Viewer {
         final boolean full;
         final Set<Integer> entities = new HashSet<>();
@@ -49,6 +51,12 @@ public final class KillEffectScene {
 
     public KillEffectScene(KillEffectContext context, KillEffectRenderer renderer, EntityIdAllocator allocator,
                            KillEffectSettings settings, PacketBudget global, Logger logger) {
+        this(context, renderer, allocator, settings, global, logger,
+                context.lite ? 0 : CapacityPolicy.FREEZE_SENDS_PER_VIEWER);
+    }
+
+    public KillEffectScene(KillEffectContext context, KillEffectRenderer renderer, EntityIdAllocator allocator,
+                           KillEffectSettings settings, PacketBudget global, Logger logger, int sendsPerViewer) {
         this.context = context;
         this.renderer = renderer;
         this.allocator = allocator;
@@ -57,7 +65,7 @@ public final class KillEffectScene {
         this.logger = logger;
         context.audience.forEach((id, full) -> viewers.put(id, new Viewer(full)));
         audienceIds = context.audience.keySet().toArray(new UUID[0]);
-        structuralReserve = context.lite ? 0 : audienceIds.length * CapacityPolicy.FREEZE_SENDS_PER_VIEWER;
+        structuralReserve = audienceIds.length * sendsPerViewer;
     }
 
     public void beginTick() {
@@ -156,6 +164,56 @@ public final class KillEffectScene {
             }
         }
         return ids;
+    }
+
+    /** Head coordinates refer to the visible skull center, not the hidden stand's feet. */
+    public int spawnHead(double x, double y, double z, float yaw) {
+        int id = allocate();
+        for (UUID viewer : audienceIds) {
+            Viewer state = viewers.get(viewer);
+            if (state == null) continue;
+            state.entities.add(id);
+            send(viewer, v -> renderer.spawnArmorStand(v, id, context.anchor.x + x,
+                    context.anchor.y + y - SKULL_HEAD_CENTER, context.anchor.z + z, yaw));
+            send(viewer, v -> renderer.hideFloatingHeadStand(v, id));
+            send(viewer, v -> renderer.equipVictimHead(v, id, context.victim));
+        }
+        return id;
+    }
+
+    public int spawnSquid(double y) {
+        int id = allocate();
+        for (UUID viewer : audienceIds) {
+            Viewer state = viewers.get(viewer);
+            if (state == null) continue;
+            state.entities.add(id);
+            send(viewer, v -> renderer.spawnSquid(v, id, context.anchor.x, context.anchor.y + y,
+                    context.anchor.z, context.death.yaw));
+        }
+        return id;
+    }
+
+    public void moveHead(int id, double x, double y, double z, float yaw) {
+        move(id, x, y - SKULL_HEAD_CENTER, z, yaw, 0);
+    }
+
+    public void move(int id, double x, double y, double z, float yaw, float pitch) {
+        if (!entities.contains(id)) return;
+        for (UUID viewer : audienceIds) {
+            send(viewer, v -> renderer.teleportEntity(v, id, context.anchor.x + x, context.anchor.y + y,
+                    context.anchor.z + z, yaw, pitch));
+            if (id == playerEntity) send(viewer, v -> renderer.headRotation(v, id, yaw));
+        }
+    }
+
+    public void sound(KillEffectRenderer.Sound sound, double height, float volume, float pitch) {
+        if (!settings.sounds || closed) return;
+        for (UUID viewer : audienceIds) {
+            if (!budget.permits(0, 1 + structuralReserve)
+                    || !global.permits(0, 1 + CapacityPolicy.STRUCTURAL_SEND_RESERVE)) break;
+            send(viewer, v -> renderer.playSound(v, sound, context.anchor.x, context.anchor.y + height,
+                    context.anchor.z, volume, pitch));
+        }
     }
 
     public void stabilizeIce(int[] ids, double vibration) {
@@ -268,4 +326,5 @@ public final class KillEffectScene {
 
     public long getTotalSends() { return totalSends + cleanupSends; }
     public long getTotalPoints() { return totalPoints; }
+    public int getStructuralReserve() { return structuralReserve; }
 }

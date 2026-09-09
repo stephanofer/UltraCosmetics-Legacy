@@ -116,6 +116,10 @@ The team may work in parallel, but shared contracts must stabilize in this order
 
 **Outcome:** all eight polished effects ship on the proven platform, with complete resources, compatibility, performance validation, and acceptance evidence.
 
+**Current status (2026-09-09):** catalog implementation and resource/compatibility changes are ready for owner-run compilation and manual validation. Release acceptance is pending; no server or performance result is implied by implementation status. See [`KILL_EFFECTS_BLOCK_2.md`](KILL_EFFECTS_BLOCK_2.md) for the handoff and evidence matrix. Blocks 0 and 1 are accepted prerequisites for this session.
+
+**Owner-directed verification:** no new tests for these effects or their catalog-specific mathematics, and no Gradle/build/test commands executed by the implementation agent. The owner compiles, tests the visuals on the real server, and supplies observations for tuning.
+
 The exact catalog, visual direction, quality rules, compatibility aliases, settings, limits, and acceptance requirements are defined in [`docs/KILL_EFFECTS_DESIGN.md`](KILL_EFFECTS_DESIGN.md), primarily under **Effect Catalog**, **Existing Effect Migration**, **Visual Design Rules**, **Performance and Capacity**, **Configuration**, **Manual Real-Server Validation**, and **Acceptance Criteria**.
 
 ### Parallel Workstreams
@@ -128,7 +132,7 @@ After Block 1 closes, effect implementations can be distributed across the team 
 | Legacy replacements | Map Explosion, Firework, and Lightning identities to their approved redesigned effects or aliases while retaining existing access, unlock, configuration, and permission behavior. |
 | Migration completion | Activate and validate the idempotent migration for category/effect configuration, custom main-menu entries, treasure chest settings and messages, flat-file equipped/unlocked data, MySQL category values, and legacy permissions now that all destination effects exist. Preserve cosmetic IDs and foreign-key relationships where possible; prefer aliases over destructive SQL rewrites. |
 | Lite variants and budgets | Give every effect a recognizable lite signature, enforce per-scene entity and point limits, precompute reusable geometry, and verify full/lite/skip decisions under concurrent load. |
-| Shared visual utilities | Add only geometry, easing, trajectory, and transform code materially required by the catalog. Keep APIs narrow, deterministic, allocation-conscious, capped, licensed correctly, and covered by JUnit where pure. |
+| Shared visual utilities | Add only geometry, easing, trajectory, and transform code materially required by the catalog. Keep APIs narrow, deterministic, allocation-conscious, capped, and licensed correctly. Validate the new compositions manually under the owner-directed verification policy. |
 | Product resources | Complete effect definitions, safe per-effect configuration, menu items, names, descriptions, control lore, purchase and treasure chest behavior, permissions, commands, and maintained message resources consistent with the existing plugin localization process. |
 | Hardening | Exercise simultaneous kills, same-chunk pressure, all interruption paths, invalid anchors, vanished victims, blocked regions/worlds, viewer preferences, protocol translation plugins, missing/incompatible PacketEvents, reload, and disable across the completed catalog. |
 | Performance and acceptance | Measure packet sends, tick cost, scene counts, entity use, and memory on the real server. Tune within the designed limits and execute every acceptance criterion without expanding the automated test scope beyond approved isolated logic. |
@@ -144,7 +148,7 @@ An effect is complete only when all of the following are true:
 - [ ] It respects fixed audiences, level of detail, viewer preference, vanish, world, region, and anchor policies.
 - [ ] It remains bounded by duration, entity, point, and packet-send controls.
 - [ ] Normal completion and every forced stop path clean all resources.
-- [ ] Applicable pure logic has JUnit coverage and rendered behavior passes manual real-server validation.
+- [ ] Rendered behavior, trajectories, timing, and cleanup pass manual real-server validation in full and lite modes; no new effect tests are required.
 
 ### Exit Gate
 
@@ -172,7 +176,7 @@ This map prevents requirements from falling between blocks. It does not replace 
 | Stable storage identifiers, alias parsing, and migration decision foundation | Block 1 |
 | Activation and end-to-end validation of every Death Effects migration path | Block 2 |
 | Remaining seven effects and legacy visual replacements | Block 2 |
-| Additional catalog geometry and effect-specific pure tests | Block 2 |
+| Additional catalog geometry and manual effect tuning | Block 2 |
 | Full catalog hardening, performance measurements, manual matrix, and final acceptance | Block 2 |
 
 ## Team Operating Rules

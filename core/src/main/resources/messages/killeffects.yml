@@ -29,3 +29,38 @@ Kill-Effects:
     Description: |-
       <gray>Seal your defeated opponent in ice,
       <gray>then shatter it into a burst of frost.
+  SquidMissile:
+    name: <bold><dark_aqua>Squid Missile
+    Description: |-
+      <gray>Your opponent transforms into a squid,
+      <gray>rockets skyward and bursts into sparks.
+  HeadRocket:
+    name: <bold><gold>Head Rocket
+    Description: |-
+      <gray>Your opponent's head ignites, spins
+      <gray>and launches into a golden firework.
+  Frostfire:
+    name: <bold><aqua>Frost<gold>fire
+    Description: |-
+      <gray>Fire and frost spiral around your opponent,
+      <gray>consuming their silhouette in a twin pulse.
+  SoulVortex:
+    name: <bold><dark_purple>Soul Vortex
+    Description: |-
+      <gray>A shadowy spiral draws out their essence
+      <gray>and pulls it into a closing portal.
+  Bloodburst:
+    name: <bold><red>Bloodburst
+    Description: |-
+      <gray>Your opponent recoils and dissolves
+      <gray>into a stylized crimson shockwave.
+  DivineJudgment:
+    name: <bold><yellow>Divine Judgment
+    Description: |-
+      <gray>Golden rings suspend your opponent
+      <gray>before a brilliant electrical strike.
+  FireworkFinale:
+    name: <bold><light_purple>Firework Finale
+    Description: |-
+      <gray>Your opponent becomes a rising star,
+      <gray>unfolding into a layered celebration.
