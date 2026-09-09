@@ -177,7 +177,8 @@ public abstract class CosmeticType<T extends Cosmetic<?>> {
     }
 
     public boolean isEnabled() {
-        return SettingsManager.getConfig().getBoolean(category.getConfigPath() + "." + configName + ".Enabled");
+        return material.isSupported()
+                && SettingsManager.getConfig().getBoolean(category.getConfigPath() + "." + configName + ".Enabled");
     }
 
     public Component getName() {

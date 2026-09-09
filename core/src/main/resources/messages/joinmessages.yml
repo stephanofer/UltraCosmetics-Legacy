@@ -20,7 +20,7 @@ Treasure-Chests-Loot-Messages:
 Join-Messages:
   Equip: <prefix> <green>You equipped <join-message-name>.
   Unequip: <prefix> <gray>You unequipped <join-message-name>.
-  Preview-Label: <yellow>Preview:
+  Preview-Label: '<yellow>Preview:'
   Controls: <gray>Left click to equip or unequip.
   Preview-Control: <aqua>Right click for a private preview.
   Preview-Cooldown: <prefix> <yellow>Please wait before previewing again.

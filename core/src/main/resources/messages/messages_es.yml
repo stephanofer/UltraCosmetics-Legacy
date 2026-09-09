@@ -218,7 +218,7 @@ Treasure-Chests-Loot-Messages:
 Join-Messages:
   Equip: <prefix> <green>Equipaste <join-message-name>.
   Unequip: <prefix> <gray>Desequipaste <join-message-name>.
-  Preview-Label: <yellow>Vista previa:
+  Preview-Label: '<yellow>Vista previa:'
   Controls: <gray>Clic izquierdo para equipar o desequipar.
   Preview-Control: <aqua>Clic derecho para una vista previa privada.
   Preview-Cooldown: <prefix> <yellow>Espera antes de volver a previsualizar.

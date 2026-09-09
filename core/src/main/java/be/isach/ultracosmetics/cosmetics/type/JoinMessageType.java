@@ -59,24 +59,24 @@ public final class JoinMessageType extends CosmeticType<JoinMessage> {
         new JoinMessageType("Arcade", XMaterial.REDSTONE_LAMP, "ENTITY_EXPERIENCE_ORB_PICKUP", 2500, 1);
         new JoinMessageType("Game", XMaterial.COMPASS, "BLOCK_NOTE_BLOCK_HARP", 500, 6);
         new JoinMessageType("Roblox", XMaterial.REDSTONE, "BLOCK_NOTE_BLOCK_PLING", 750, 5);
-        new JoinMessageType("Spawn", XMaterial.GRASS_BLOCK, "BLOCK_NOTE_BLOCK_BELL", 750, 5);
-        new JoinMessageType("WildAppearance", XMaterial.SPAWNER, "BLOCK_NOTE_BLOCK_CHIME", 1000, 4);
-        new JoinMessageType("Landing", XMaterial.ELYTRA, "ENTITY_BAT_TAKEOFF", 1500, 3);
-        new JoinMessageType("BraceYourselves", XMaterial.SHIELD, "ITEM_SHIELD_BLOCK", 1500, 3);
+        new JoinMessageType("Spawn", XMaterial.GRASS_BLOCK, "BLOCK_NOTE_BLOCK_HARP", 750, 5);
+        new JoinMessageType("WildAppearance", XMaterial.SPAWNER, "BLOCK_NOTE_BLOCK_PLING", 1000, 4);
+        new JoinMessageType("Landing", XMaterial.FEATHER, "ENTITY_BAT_TAKEOFF", 1500, 3);
+        new JoinMessageType("BraceYourselves", XMaterial.IRON_CHESTPLATE, "BLOCK_ANVIL_LAND", 1500, 3);
         new JoinMessageType("PartyOver", XMaterial.JUKEBOX, "BLOCK_CHEST_CLOSE", 1500, 3);
-        new JoinMessageType("Overpowered", XMaterial.NETHER_STAR, "BLOCK_BEACON_ACTIVATE", 2500, 1);
-        new JoinMessageType("Achievement", XMaterial.BOOK, "UI_TOAST_CHALLENGE_COMPLETE", 2000, 2);
+        new JoinMessageType("Overpowered", XMaterial.NETHER_STAR, "ENTITY_WITHER_SPAWN", 2500, 1);
+        new JoinMessageType("Achievement", XMaterial.BOOK, "ENTITY_PLAYER_LEVELUP", 2000, 2);
         new JoinMessageType("Hacker", XMaterial.COMMAND_BLOCK, "ENTITY_ENDERMAN_STARE", 2500, 1);
         new JoinMessageType("MoneyMan", XMaterial.EMERALD, "ENTITY_VILLAGER_YES", 1500, 3);
         new JoinMessageType("Minecrafter", XMaterial.DIAMOND_PICKAXE, "BLOCK_ANVIL_USE", 1500, 3);
-        new JoinMessageType("SuperSaiyan", XMaterial.GOLDEN_APPLE, "ENTITY_BLAZE_SHOOT", 2500, 1);
+        new JoinMessageType("SuperSaiyan", XMaterial.GOLDEN_APPLE, "ENTITY_GHAST_SHOOT", 2500, 1);
         new JoinMessageType("Impostor", XMaterial.RED_DYE, "ENTITY_CREEPER_PRIMED", 1500, 3);
         new JoinMessageType("Hide", XMaterial.SKELETON_SKULL, "ENTITY_GHAST_WARN", 1500, 3);
-        new JoinMessageType("Uchiha", XMaterial.REDSTONE_TORCH, "ENTITY_ILLUSIONER_CAST_SPELL", 3000, 1);
-        new JoinMessageType("PirateKing", XMaterial.HEART_OF_THE_SEA, "ITEM_TRIDENT_RETURN", 3000, 1);
-        new JoinMessageType("Stardust", XMaterial.AMETHYST_SHARD, "BLOCK_AMETHYST_BLOCK_CHIME", 2500, 1);
+        new JoinMessageType("Uchiha", XMaterial.REDSTONE_TORCH, "ENTITY_ENDERMAN_SCREAM", 3000, 1);
+        new JoinMessageType("PirateKing", XMaterial.COMPASS, "ENTITY_ITEM_PICKUP", 3000, 1);
+        new JoinMessageType("Stardust", XMaterial.GLOWSTONE_DUST, "BLOCK_NOTE_BLOCK_PLING", 2500, 1);
         new JoinMessageType("Spotlight", XMaterial.NAME_TAG, "ENTITY_FIREWORK_ROCKET_TWINKLE", 2000, 2);
-        new JoinMessageType("Speedrunner", XMaterial.CLOCK, "ITEM_ELYTRA_FLYING", 2000, 2);
+        new JoinMessageType("Speedrunner", XMaterial.CLOCK, "ENTITY_BAT_LOOP", 2000, 2);
     }
 
     private static int clamp(String path, int fallback, int minimum, int maximum) {
@@ -110,6 +110,12 @@ public final class JoinMessageType extends CosmeticType<JoinMessage> {
         if (configured.isEmpty()) return;
         XSound matched = XSound.matchXSound(configured).orElse(null);
         sound = matched == null ? null : matched.parseSound();
+        if (sound == null && !configured.equals(defaultSound)) {
+            configured = defaultSound;
+            config.set(path + ".Sound.Name", configured);
+            matched = XSound.matchXSound(configured).orElse(null);
+            sound = matched == null ? null : matched.parseSound();
+        }
         if (sound == null) {
             UltraCosmeticsData.get().getPlugin().getSmartLogger().write(LogLevel.WARNING,
                     "Invalid or unsupported Join Message sound at " + path + ".Sound.Name: " + configured);
