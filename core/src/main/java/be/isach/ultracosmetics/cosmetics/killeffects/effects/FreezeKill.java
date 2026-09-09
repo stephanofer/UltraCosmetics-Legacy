@@ -52,20 +52,22 @@ public final class FreezeKill extends KillEffect {
         protected void onTick(int elapsed) {
             int t = context.lite ? elapsed : FreezeTimeline.animationTick(elapsed, duration);
             if (elapsed == 0) {
-                if (!context.lite) body = scene.spawnPlayer();
-                ring(Particle.SNOW, 0.8, 0.15, 24);
                 scene.sound(0.35f, 0.7f);
+                if (!context.lite) {
+                    lower = scene.spawnIce(0);
+                    middle = scene.spawnIce(1);
+                    upper = scene.spawnIce(2);
+                    cap = scene.spawnIce(3);
+                }
             }
             if (context.lite) {
-                if (t < 7) ring(Particle.CYAN, 0.7 - t * 0.07, t * 0.22, 12);
+                if (t < 7) ring(Particle.ICE, 0.7 - t * 0.07, t * 0.22, 12);
                 return;
             }
-            if (t >= 1 && lower == null) lower = scene.spawnIce(0);
-            if (t >= 3 && middle == null) middle = scene.spawnIce(1);
-            if (t >= 5 && upper == null) upper = scene.spawnIce(2);
-            if (t >= 7 && cap == null) cap = scene.spawnIce(3);
+            // Keep the replica after all ice entities for legacy transparency ordering.
+            if (elapsed >= 1 && body == -1) body = scene.spawnPlayer(0.125);
             // Provisional 2-tick correction; the real-server spike must establish the lowest stable frequency.
-            if (elapsed % 2 == 0 && t < 56) {
+            if (elapsed > 0 && elapsed % 2 == 0 && t < 56) {
                 double vibration = t >= 43 ? Math.sin(t * 2.4) * 0.025 : 0;
                 scene.stabilizeIce(lower, vibration);
                 scene.stabilizeIce(middle, -vibration);
@@ -77,15 +79,6 @@ public final class FreezeKill extends KillEffect {
             switch (FreezeTimeline.phase(t)) {
                 case FREEZE:
                     ring(Particle.ICE, 0.55, t / 3.0, 12);
-                    break;
-                case SEAL:
-                    if (elapsed % 2 == 0) ring(Particle.CYAN, 0.65, 1, 24);
-                    break;
-                case HOLD:
-                    if (elapsed % 5 == 0) {
-                        scene.particle(Particle.SNOW, random.nextDouble() - 0.5, 1.9, random.nextDouble() - 0.5, 0);
-                        scene.particle(Particle.CLOUD, 0, 1.55, 0, 0);
-                    }
                     break;
                 case FRACTURE:
                     ring(Particle.ICE, 0.54, random.nextDouble() * 1.8, 6 + (t - 43));
@@ -101,7 +94,6 @@ public final class FreezeKill extends KillEffect {
                     if (t == 57) scene.status(body, (byte) 3);
                     break;
                 case CLEANUP:
-                    ring(Particle.CLOUD, 0.35, 1, 12);
                     scene.destroy(body);
                     break;
                 default: break;

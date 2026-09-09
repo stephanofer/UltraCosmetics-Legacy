@@ -21,6 +21,7 @@ import com.github.retrooper.packetevents.protocol.player.EquipmentSlot;
 import com.github.retrooper.packetevents.protocol.player.TextureProperty;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.protocol.player.UserProfile;
+import com.github.retrooper.packetevents.protocol.util.LegacyComponent;
 import com.github.retrooper.packetevents.protocol.sound.SoundCategory;
 import com.github.retrooper.packetevents.protocol.sound.StaticSound;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
@@ -30,9 +31,12 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import com.github.retrooper.packetevents.wrapper.play.server.*;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -44,6 +48,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public final class PacketEventsKillEffectRenderer implements KillEffectRenderer {
     private static final StaticSound GLASS_BREAK = new StaticSound(new ResourceLocation("dig.glass"), null);
     private final Map<User, Set<UUID>> knownProfiles = new ConcurrentHashMap<>();
+    private final TabNameTags tabNameTags;
     private volatile boolean closed;
     private final PacketListenerAbstract profiles = new PacketListenerAbstract(PacketListenerPriority.MONITOR) {
         @Override
@@ -77,6 +82,7 @@ public final class PacketEventsKillEffectRenderer implements KillEffectRenderer 
         if (EntityTypes.ARMOR_STAND == null || ParticleTypes.BLOCK == null || ItemTypes.ICE == null) {
             throw new IllegalStateException("Required protocol registries unavailable");
         }
+        tabNameTags = TabNameTags.create();
         PacketEvents.getAPI().getEventManager().registerListener(profiles);
     }
 
@@ -107,6 +113,11 @@ public final class PacketEventsKillEffectRenderer implements KillEffectRenderer 
         return skin;
     }
 
+    @Override
+    public NameTag captureNameTag(Player player) {
+        return tabNameTags == null ? null : tabNameTags.capture(player);
+    }
+
     private void send(UUID viewer, PacketWrapper<?> packet) {
         Player player = Bukkit.getPlayer(viewer);
         if (player == null || !player.isOnline()) throw new IllegalStateException("Viewer disconnected");
@@ -124,6 +135,22 @@ public final class PacketEventsKillEffectRenderer implements KillEffectRenderer 
                 null, new UserProfile(profile, victim.name, skin), GameMode.SURVIVAL, 0);
         send(viewer, new WrapperPlayServerPlayerInfo(add ? WrapperPlayServerPlayerInfo.Action.ADD_PLAYER
                 : WrapperPlayServerPlayerInfo.Action.REMOVE_PLAYER, data));
+    }
+
+    @Override
+    public void createNameTag(UUID viewer, String teamName, VictimSnapshot victim) {
+        WrapperPlayServerTeams.ScoreBoardTeamInfo info = new WrapperPlayServerTeams.ScoreBoardTeamInfo(
+                new LegacyComponent(teamName), new LegacyComponent(victim.prefix), new LegacyComponent(victim.suffix),
+                WrapperPlayServerTeams.NameTagVisibility.ALWAYS, WrapperPlayServerTeams.CollisionRule.ALWAYS,
+                net.kyori.adventure.text.format.NamedTextColor.WHITE, WrapperPlayServerTeams.OptionData.NONE);
+        send(viewer, new WrapperPlayServerTeams(teamName, WrapperPlayServerTeams.TeamMode.CREATE, info,
+                Collections.singletonList(victim.name)));
+    }
+
+    @Override
+    public void removeNameTag(UUID viewer, String teamName) {
+        send(viewer, new WrapperPlayServerTeams(teamName, WrapperPlayServerTeams.TeamMode.REMOVE,
+                (WrapperPlayServerTeams.ScoreBoardTeamInfo) null, Collections.emptyList()));
     }
 
     @Override
@@ -218,5 +245,51 @@ public final class PacketEventsKillEffectRenderer implements KillEffectRenderer 
     @Override
     public void destroyEntities(UUID viewer, int[] entities) {
         send(viewer, new WrapperPlayServerDestroyEntities(entities));
+    }
+
+    private static final class TabNameTags {
+        private final Object api;
+        private final Object manager;
+        private final Method getPlayer;
+        private final Method getPrefix;
+        private final Method getSuffix;
+
+        private TabNameTags(Object api, Object manager, Method getPlayer, Method getPrefix, Method getSuffix) {
+            this.api = api;
+            this.manager = manager;
+            this.getPlayer = getPlayer;
+            this.getPrefix = getPrefix;
+            this.getSuffix = getSuffix;
+        }
+
+        static TabNameTags create() {
+            Plugin tab = Bukkit.getPluginManager().getPlugin("TAB");
+            if (tab == null || !tab.isEnabled()) return null;
+            try {
+                ClassLoader loader = tab.getClass().getClassLoader();
+                Class<?> apiClass = Class.forName("me.neznamy.tab.api.TabAPI", false, loader);
+                Class<?> playerClass = Class.forName("me.neznamy.tab.api.TabPlayer", false, loader);
+                Class<?> managerClass = Class.forName("me.neznamy.tab.api.nametag.NameTagManager", false, loader);
+                Object api = apiClass.getMethod("getInstance").invoke(null);
+                Object manager = apiClass.getMethod("getNameTagManager").invoke(api);
+                return new TabNameTags(api, manager, apiClass.getMethod("getPlayer", UUID.class),
+                        managerClass.getMethod("getOriginalReplacedPrefix", playerClass),
+                        managerClass.getMethod("getOriginalReplacedSuffix", playerClass));
+            } catch (ReflectiveOperationException | RuntimeException | LinkageError e) {
+                Bukkit.getLogger().warning("Kill Effects could not connect to TAB name tags: " + e);
+                return null;
+            }
+        }
+
+        NameTag capture(Player player) {
+            try {
+                Object tabPlayer = getPlayer.invoke(api, player.getUniqueId());
+                if (tabPlayer == null) return null;
+                return new NameTag((String) getPrefix.invoke(manager, tabPlayer),
+                        (String) getSuffix.invoke(manager, tabPlayer));
+            } catch (ReflectiveOperationException | RuntimeException | LinkageError e) {
+                return null;
+            }
+        }
     }
 }

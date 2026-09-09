@@ -136,3 +136,13 @@ tooling/ObfuscatedFields generator/*.txt
 !tooling/ObfuscatedFields generator/README.txt
 tooling/ObfuscatedFields generator/*.java
 !tooling/ObfuscatedFields generator/ObfuscatedFields_template.java
+
+# Local libraries
+libs/
+
+# Root test / debug screenshots
+/*.png
+/*.jpg
+/*.jpeg
+/*.webp
+

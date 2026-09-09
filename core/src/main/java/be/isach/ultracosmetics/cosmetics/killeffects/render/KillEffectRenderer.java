@@ -8,9 +8,22 @@ import java.util.UUID;
 /** Each rendering method sends exactly one packet to one viewer. */
 public interface KillEffectRenderer extends AutoCloseable {
     enum Particle { SNOW, ICE, CYAN, CLOUD }
+    final class NameTag {
+        public final String prefix;
+        public final String suffix;
+
+        public NameTag(String prefix, String suffix) {
+            this.prefix = prefix;
+            this.suffix = suffix;
+        }
+    }
+
     List<VictimSnapshot.SkinProperty> captureSkin(Player player);
+    NameTag captureNameTag(Player player);
     boolean knowsProfile(UUID viewer, UUID profile);
     void profile(UUID viewer, UUID profile, VictimSnapshot victim, boolean add);
+    void createNameTag(UUID viewer, String teamName, VictimSnapshot victim);
+    void removeNameTag(UUID viewer, String teamName);
     void spawnPlayer(UUID viewer, int entity, UUID profile, double x, double y, double z, float yaw, float pitch);
     void headRotation(UUID viewer, int entity, float yaw);
     void spawnArmorStand(UUID viewer, int entity, double x, double y, double z, float yaw);

@@ -67,6 +67,17 @@ public class FreezeContextTest {
         try { context.audience.clear(); fail("Audience must be immutable"); } catch (UnsupportedOperationException expected) { }
     }
 
+    @Test
+    public void snapshotSafelyCutsLegacyNameTagFields() {
+        UUID id = UUID.randomUUID();
+        VictimSnapshot victim = new VictimSnapshot(id, "Victim", Collections.emptyList(), Collections.emptySet(),
+                "123456789012345\u00a7cRed", "1234567890123456TooLong");
+        assertTrue(victim.hasNameTag);
+        assertEquals("123456789012345", victim.prefix);
+        assertEquals("1234567890123456", victim.suffix);
+        assertEquals("", VictimSnapshot.cutTo(null, 16));
+    }
+
     @Test(expected = IllegalArgumentException.class)
     public void nonFinitePositionsAreRejected() {
         new KillEffectPosition(UUID.randomUUID(), Double.NaN, 64, 0, 0, 0);

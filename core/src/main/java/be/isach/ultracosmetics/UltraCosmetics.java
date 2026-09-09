@@ -147,6 +147,7 @@ public class UltraCosmetics extends JavaPlugin {
     private UnmovableItemListener unmovableItemListener;
     private TreasureChestManager treasureChestManager;
     private KillEffectManager killEffectManager;
+    private AutoCloseable playerDeathAnimationFilter;
 
     public KillEffectManager getKillEffectManager() {
         return killEffectManager != null && killEffectManager.isAvailable() ? killEffectManager : null;
@@ -317,6 +318,8 @@ public class UltraCosmetics extends JavaPlugin {
         // Register Listeners.
         registerListeners();
 
+        playerDeathAnimationFilter = KillEffectRendererFactory.suppressPlayerDeathAnimation(this);
+
         // Set up Cosmetics config.
         if (config.getBoolean("Categories-Enabled.Kill-Effects")) {
             KillEffectRenderer renderer = KillEffectRendererFactory.create(this);
@@ -435,6 +438,15 @@ public class UltraCosmetics extends JavaPlugin {
     }
 
     public void shutdown() {
+        if (playerDeathAnimationFilter != null) {
+            try {
+                playerDeathAnimationFilter.close();
+            } catch (Exception | LinkageError e) {
+                getLogger().warning("Player death animation filter cleanup failed: " + e);
+            } finally {
+                playerDeathAnimationFilter = null;
+            }
+        }
         if (killEffectManager != null) {
             killEffectManager.close();
             killEffectManager = null;

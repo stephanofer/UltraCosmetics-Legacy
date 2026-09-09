@@ -18,6 +18,7 @@ softdepend:
   - PEconomy
   - PlayerAuctions
   - packetevents
+  - TAB
 commands:
   ultracosmetics:
     aliases: [ uc, cosmetics ]

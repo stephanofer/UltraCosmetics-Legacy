@@ -2,8 +2,8 @@ package be.isach.ultracosmetics.cosmetics.killeffects.runtime;
 
 public final class CapacityPolicy {
     public static final int STRUCTURAL_SEND_RESERVE = 4096;
-    // Four new stands (twelve packets) plus stabilizing all sixteen (thirty-two packets).
-    public static final int FREEZE_SENDS_PER_VIEWER = 44;
+    // All sixteen stands at entry (spawn, metadata, helmet); stabilization starts later.
+    public static final int FREEZE_SENDS_PER_VIEWER = 48;
     public enum Detail { FULL, LITE, SKIP }
 
     private CapacityPolicy() { }

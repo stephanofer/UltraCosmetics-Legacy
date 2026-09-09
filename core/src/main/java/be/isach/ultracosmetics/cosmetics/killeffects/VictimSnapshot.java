@@ -23,12 +23,35 @@ public final class VictimSnapshot {
     public final String name;
     public final List<SkinProperty> skin;
     public final Set<UUID> visibleTo;
+    public final String prefix;
+    public final String suffix;
+    public final boolean hasNameTag;
 
     public VictimSnapshot(UUID uuid, String name, List<SkinProperty> skin, Set<UUID> visibleTo) {
+        this(uuid, name, skin, visibleTo, "", "", false);
+    }
+
+    public VictimSnapshot(UUID uuid, String name, List<SkinProperty> skin, Set<UUID> visibleTo,
+                          String prefix, String suffix) {
+        this(uuid, name, skin, visibleTo, prefix, suffix, true);
+    }
+
+    private VictimSnapshot(UUID uuid, String name, List<SkinProperty> skin, Set<UUID> visibleTo,
+                           String prefix, String suffix, boolean hasNameTag) {
         this.uuid = java.util.Objects.requireNonNull(uuid);
         if (name == null || !name.matches("[A-Za-z0-9_]{1,16}")) throw new IllegalArgumentException("Invalid profile name");
         this.name = name;
         this.skin = Collections.unmodifiableList(new ArrayList<>(skin));
         this.visibleTo = Collections.unmodifiableSet(new HashSet<>(visibleTo));
+        this.prefix = cutTo(prefix, 16);
+        this.suffix = cutTo(suffix, 16);
+        this.hasNameTag = hasNameTag;
+    }
+
+    public static String cutTo(String value, int limit) {
+        if (value == null) return "";
+        if (value.length() <= limit) return value;
+        if (value.charAt(limit - 1) == '\u00a7') return value.substring(0, limit - 1);
+        return value.substring(0, limit);
     }
 }

@@ -56,10 +56,10 @@ public class RuntimeLimitsTest {
 
     @Test
     public void fullAudienceAdmissionReservesStructuralSendsWithoutOverflow() {
-        assertTrue(CapacityPolicy.supportsFullAudience(46, 0));
-        assertTrue(CapacityPolicy.supportsFullAudience(24, 3000));
-        assertFalse(CapacityPolicy.supportsFullAudience(25, 3000));
-        assertFalse(CapacityPolicy.supportsFullAudience(47, 0));
+        assertTrue(CapacityPolicy.supportsFullAudience(42, 0));
+        assertTrue(CapacityPolicy.supportsFullAudience(22, 3000));
+        assertFalse(CapacityPolicy.supportsFullAudience(23, 3000));
+        assertFalse(CapacityPolicy.supportsFullAudience(43, 0));
         assertFalse(CapacityPolicy.supportsFullAudience(Integer.MAX_VALUE, 0));
         assertFalse(CapacityPolicy.supportsFullAudience(0, 0));
     }

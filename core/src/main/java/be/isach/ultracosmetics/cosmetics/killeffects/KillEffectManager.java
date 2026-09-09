@@ -65,7 +65,12 @@ public final class KillEffectManager implements Listener {
         for (Player viewer : Bukkit.getOnlinePlayers()) {
             if (!settings.respectVanish || viewer.canSee(victim)) visible.add(viewer.getUniqueId());
         }
-        return new VictimSnapshot(victim.getUniqueId(), victim.getName(), renderer.captureSkin(victim), visible);
+        KillEffectRenderer.NameTag nameTag = renderer.captureNameTag(victim);
+        if (nameTag == null) {
+            return new VictimSnapshot(victim.getUniqueId(), victim.getName(), renderer.captureSkin(victim), visible);
+        }
+        return new VictimSnapshot(victim.getUniqueId(), victim.getName(), renderer.captureSkin(victim), visible,
+                nameTag.prefix, nameTag.suffix);
     }
 
     public boolean play(Player killer, Player victim) {

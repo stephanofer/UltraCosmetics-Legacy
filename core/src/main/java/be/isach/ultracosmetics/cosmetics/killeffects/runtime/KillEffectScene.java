@@ -24,6 +24,7 @@ public final class KillEffectScene {
         final boolean full;
         final Set<Integer> entities = new HashSet<>();
         UUID lease;
+        boolean nameTag;
         Viewer(boolean full) { this.full = full; }
     }
 
@@ -42,6 +43,8 @@ public final class KillEffectScene {
     private final Set<Integer> quarantined = new HashSet<>();
     private boolean closed;
     private boolean playerSpawned;
+    private int playerEntity = -1;
+    private String nameTagTeam;
     private long totalSends, totalPoints, cleanupSends;
 
     public KillEffectScene(KillEffectContext context, KillEffectRenderer renderer, EntityIdAllocator allocator,
@@ -99,15 +102,21 @@ public final class KillEffectScene {
         return id;
     }
 
-    public int spawnPlayer() {
+    public int spawnPlayer(double yOffset) {
         if (playerSpawned) throw new IllegalStateException("A scene can own only one victim replica");
         playerSpawned = true;
         int id = allocate();
+        playerEntity = id;
+        nameTagTeam = "uc_" + Integer.toUnsignedString(id, 36);
         Player victim = Bukkit.getPlayer(context.victim.uuid);
         for (UUID viewer : audienceIds) {
             Viewer state = viewers.get(viewer);
             if (state == null) continue;
             Player player = Bukkit.getPlayer(viewer);
+            if (context.victim.hasNameTag) {
+                state.nameTag = true; // Track before sending so partial setup is always cleaned.
+                send(viewer, v -> renderer.createNameTag(v, nameTagTeam, context.victim));
+            }
             UUID profile = context.victim.uuid;
             if (victim == null || !victim.isOnline() || player == null || !player.canSee(victim)
                     || !renderer.knowsProfile(viewer, context.victim.uuid)) {
@@ -118,7 +127,7 @@ public final class KillEffectScene {
             }
             UUID identity = profile;
             state.entities.add(id); // Track before sending so partial setup is always cleaned.
-            send(viewer, v -> renderer.spawnPlayer(v, id, identity, context.death.x, context.death.y, context.death.z,
+            send(viewer, v -> renderer.spawnPlayer(v, id, identity, context.death.x, context.death.y + yOffset, context.death.z,
                     context.death.yaw, context.death.pitch));
             send(viewer, v -> renderer.headRotation(v, id, context.death.yaw));
         }
@@ -196,7 +205,9 @@ public final class KillEffectScene {
         for (UUID viewer : audienceIds) {
             Viewer state = viewers.get(viewer);
             if (state != null && state.entities.remove(id)) destroyFor(viewer, new int[]{id});
+            if (id == playerEntity && state != null) removeNameTagFor(viewer, state);
         }
+        if (id == playerEntity) playerEntity = -1;
         if (!quarantined.contains(id)) allocator.release(id);
     }
 
@@ -218,10 +229,24 @@ public final class KillEffectScene {
         }
     }
 
+    private void removeNameTagFor(UUID viewer, Viewer state) {
+        if (!state.nameTag) return;
+        state.nameTag = false;
+        Player player = Bukkit.getPlayer(viewer);
+        if (player == null || !player.isOnline()) return;
+        try {
+            cleanupSends++;
+            renderer.removeNameTag(viewer, nameTagTeam);
+        } catch (RuntimeException | LinkageError e) {
+            logger.warning("Kill Effect temporary name tag cleanup failed: " + e);
+        }
+    }
+
     public void removeViewer(UUID viewer) {
         Viewer state = viewers.remove(viewer);
         if (state == null) return;
         if (!state.entities.isEmpty()) destroyFor(viewer, state.entities.stream().mapToInt(Integer::intValue).toArray());
+        removeNameTagFor(viewer, state);
         if (state.lease != null && Bukkit.getPlayer(viewer) != null) {
             try {
                 cleanupSends++;

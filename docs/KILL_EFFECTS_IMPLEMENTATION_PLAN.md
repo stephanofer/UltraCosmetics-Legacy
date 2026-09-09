@@ -98,17 +98,17 @@ The team may work in parallel, but shared contracts must stabilize in this order
 
 ### Exit Gate
 
-- [ ] A killer's selected Freeze Kill triggers at the victim's resolved death location; the victim's own selection does not trigger on death.
-- [ ] Multiple overlapping executions from the same killer have isolated mutable state.
-- [ ] Eligible viewers receive the correct full or reduced scene; ineligible viewers receive nothing.
-- [ ] The fake victim has the correct supported identity presentation and does not corrupt the real victim's tab-list entry.
-- [ ] Ice and body visuals are packet-only, traversable, stable, and leave no blocks, entities, drops, damage, or gameplay changes.
-- [ ] Preview is private, reusable through the same runtime, limited, cooled down, and cleaned before replacement.
-- [ ] Capacity produces Freeze Kill's lite signature or safely skips; it never queues.
-- [ ] Every required completion and interruption path destroys scene resources exactly once from the runtime's perspective.
-- [ ] PacketEvents absence or incompatibility disables only Kill Effects and does not prevent UltraCosmetics from loading.
-- [ ] Stable storage identifiers, category aliases, cosmetic alias parsing, and idempotent migration decision logic are covered by unit tests without modifying or losing legacy data prematurely.
-- [ ] Applicable JUnit tests pass and all Freeze Kill, lifecycle, compatibility, and protocol-stack manual checks in the design are recorded as passing.
+- [x] A killer's selected Freeze Kill triggers at the victim's resolved death location; the victim's own selection does not trigger on death.
+- [x] Multiple overlapping executions from the same killer have isolated mutable state.
+- [x] Eligible viewers receive the correct full or reduced scene; ineligible viewers receive nothing.
+- [x] The fake victim has the correct supported identity presentation and does not corrupt the real victim's tab-list entry.
+- [x] Ice and body visuals are packet-only, traversable, stable, and leave no blocks, entities, drops, damage, or gameplay changes.
+- [x] Preview is private, reusable through the same runtime, limited, cooled down, and cleaned before replacement.
+- [x] Capacity produces Freeze Kill's lite signature or safely skips; it never queues.
+- [x] Every required completion and interruption path destroys scene resources exactly once from the runtime's perspective.
+- [x] PacketEvents absence or incompatibility disables only Kill Effects and does not prevent UltraCosmetics from loading.
+- [x] Stable storage identifiers, category aliases, cosmetic alias parsing, and idempotent migration decision logic are covered by unit tests without modifying or losing legacy data prematurely.
+- [x] Applicable JUnit tests pass and all Freeze Kill, lifecycle, compatibility, and protocol-stack manual checks in the design are recorded as passing.
 
 **Do not begin production work on the other seven effects until this gate passes.** Small exploratory prototypes are acceptable only when they answer a documented platform question and are not merged as production effect implementations.
 
