@@ -82,6 +82,9 @@ public class MenuMain extends Menu {
     protected int[] makeLayout(int visible) {
         int[] layout = null;
         switch (visible) {
+            case 11:
+                layout = new int[] {10, 11, 12, 13, 14, 15, 16, 20, 22, 24, 26};
+                break;
             case 10:
                 layout = new int[] {9, 11, 13, 15, 17, 27, 29, 31, 33, 35};
                 break;

@@ -8,9 +8,9 @@ import be.isach.ultracosmetics.cosmetics.Category;
 import be.isach.ultracosmetics.cosmetics.suits.ArmorSlot;
 import be.isach.ultracosmetics.player.UltraPlayer;
 import be.isach.ultracosmetics.player.UltraPlayerManager;
-import be.isach.ultracosmetics.player.profile.CosmeticsProfile;
 import be.isach.ultracosmetics.run.FallDamageManager;
 import be.isach.ultracosmetics.util.ItemFactory;
+import be.isach.ultracosmetics.version.ServerVersion;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -48,6 +48,9 @@ public class PlayerListener implements Listener {
     private final long joinItemDelay = SettingsManager.getConfig().getLong("Item-Delay.Join", 1);
     private final long respawnItemDelay = SettingsManager.getConfig().getLong("Item-Delay.World-Change-Or-Respawn", 0);
     private final boolean updateOnWorldChange = SettingsManager.getConfig().getBoolean("Always-Update-Cosmetics-On-World-Change", false);
+    private final boolean takeOverJoinMessage = SettingsManager.getConfig().getBoolean("Join-Message-Settings.Take-Over-Join-Message", true);
+    private final boolean suppressQuitMessage = SettingsManager.getConfig().getBoolean("Join-Message-Settings.Suppress-Quit-Message", true);
+    private final boolean joinMessagesSupported = UltraCosmeticsData.get().getServerVersion() == ServerVersion.v1_8;
 
     public PlayerListener(UltraCosmetics ultraCosmetics) {
         this.ultraCosmetics = ultraCosmetics;
@@ -63,6 +66,7 @@ public class PlayerListener implements Listener {
 
     @EventHandler
     public void onJoin(final PlayerJoinEvent event) {
+        final long joinedAt = System.currentTimeMillis();
         UltraPlayer ultraPlayer = pm.getUltraPlayer(event.getPlayer());
         if (SettingsManager.isAllowedWorld(event.getPlayer().getWorld())) {
             // Delay in case other plugins clear inventory on join
@@ -71,7 +75,12 @@ public class PlayerListener implements Listener {
                     ultraPlayer.giveMenuItem();
                 }
                 if (UltraCosmeticsData.get().areCosmeticsProfilesEnabled()) {
-                    ultraPlayer.getProfile().onLoad(CosmeticsProfile::equip);
+                    ultraPlayer.getProfile().onLoad(profile -> {
+                        profile.equip();
+                        if (ultraCosmetics.getJoinMessageCoordinator() != null) {
+                            ultraCosmetics.getJoinMessageCoordinator().announce(ultraPlayer, joinedAt);
+                        }
+                    });
                 }
             }, joinItemDelay);
         }
@@ -87,6 +96,11 @@ public class PlayerListener implements Listener {
                 ultraPlayer.sendMessage(Component.empty().append(prefix).append(use).append(command).append(toInstall));
             }
         }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void suppressJoinMessage(PlayerJoinEvent event) {
+        if (joinMessagesSupported && takeOverJoinMessage) event.setJoinMessage(null);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -135,9 +149,17 @@ public class PlayerListener implements Listener {
 
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
+        if (ultraCosmetics.getJoinMessageCoordinator() != null) {
+            ultraCosmetics.getJoinMessageCoordinator().removePlayer(event.getPlayer().getUniqueId());
+        }
         pm.getUltraPlayer(event.getPlayer()).dispose();
         // workaround plugins calling events after player quit
         Bukkit.getScheduler().runTaskLater(ultraCosmetics, () -> pm.remove(event.getPlayer()), 1);
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void suppressQuitMessage(PlayerQuitEvent event) {
+        if (joinMessagesSupported && suppressQuitMessage) event.setQuitMessage(null);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)

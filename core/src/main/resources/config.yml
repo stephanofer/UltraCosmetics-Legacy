@@ -13,6 +13,7 @@ Categories-Enabled:
   Emotes: true
   Projectile-Effects: true
   Kill-Effects: true
+  Join-Messages: true
 # Shared packet-only Kill Effect runtime limits.
 Kill-Effects-Settings:
   Visible-Range: 32
@@ -29,6 +30,18 @@ Kill-Effects-Settings:
   Sounds: true
   Respect-Vanish: true
   Lite-Mode-On-Capacity: true
+
+Join-Message-Settings:
+  Take-Over-Join-Message: true
+  Suppress-Quit-Message: true
+  Sounds: true
+  Preview-Cooldown-Seconds: 2
+  Maximum-Announcement-Delay-Seconds: 5
+
+Chat-Formatting:
+  Center-Pixel: 154
+  Maximum-Line-Width-Pixels: 300
+  Maximum-Output-Lines: 5
 
 # Other settings for categories:
 # - The Item in Main Menu.
@@ -69,6 +82,9 @@ Categories:
     Go-Back-Arrow: true
   Kill-Effects:
     Main-Menu-Item: ICE
+    Go-Back-Arrow: true
+  Join-Messages:
+    Main-Menu-Item: OAK_DOOR
     Go-Back-Arrow: true
   Clear-Cosmetic-Item: BARRIER
   Previous-Page-Item: ENDER_PEARL
@@ -225,6 +241,11 @@ TreasureChests:
       Message:
         enabled: false
     Kill-Effects:
+      Enabled: true
+      Chance: 5
+      Message:
+        enabled: false
+    Join-Messages:
       Enabled: true
       Chance: 5
       Message:

@@ -12,6 +12,7 @@ import be.isach.ultracosmetics.cosmetics.killeffects.KillEffectManager;
 import be.isach.ultracosmetics.cosmetics.killeffects.compatibility.KillEffectMigration;
 import be.isach.ultracosmetics.cosmetics.killeffects.render.KillEffectRenderer;
 import be.isach.ultracosmetics.cosmetics.killeffects.render.KillEffectRendererFactory;
+import be.isach.ultracosmetics.cosmetics.joinmessages.JoinMessageCoordinator;
 import be.isach.ultracosmetics.cosmetics.type.CosmeticType;
 import be.isach.ultracosmetics.economy.EconomyHandler;
 import be.isach.ultracosmetics.hook.ChestSortHook;
@@ -147,10 +148,15 @@ public class UltraCosmetics extends JavaPlugin {
     private UnmovableItemListener unmovableItemListener;
     private TreasureChestManager treasureChestManager;
     private KillEffectManager killEffectManager;
+    private JoinMessageCoordinator joinMessageCoordinator;
     private AutoCloseable playerDeathAnimationFilter;
 
     public KillEffectManager getKillEffectManager() {
         return killEffectManager != null && killEffectManager.isAvailable() ? killEffectManager : null;
+    }
+
+    public JoinMessageCoordinator getJoinMessageCoordinator() {
+        return joinMessageCoordinator;
     }
 
     /**
@@ -327,6 +333,7 @@ public class UltraCosmetics extends JavaPlugin {
         }
         CosmeticType.loadCustomCosmetics();
         CosmeticType.registerAll();
+        joinMessageCoordinator = new JoinMessageCoordinator(this);
 
         // Can't use Category.MORPHS.isEnabled() here because it checks whether LibsDisguises is enabled on its own
         if (SettingsManager.getConfig().getBoolean("Categories-Enabled." + Category.MORPHS.getConfigPath())) {
@@ -451,6 +458,7 @@ public class UltraCosmetics extends JavaPlugin {
             killEffectManager.close();
             killEffectManager = null;
         }
+        joinMessageCoordinator = null;
         // Prepare for re-enable
         HandlerList.unregisterAll(this);
         Bukkit.getScheduler().cancelTasks(this);

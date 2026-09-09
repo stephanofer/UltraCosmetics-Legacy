@@ -1,0 +1,223 @@
+Clear:
+  Join-Messages: <bold><red>Clear current join message
+Menu:
+  Join-Messages:
+    Title: <bold>Join Messages
+    Button:
+      Name: <bold><yellow>Join Messages
+      Lore: |-
+        <gray>Announce your arrival in style.
+
+        <gray>Unlocked: </gray><white><unlocked>
+      Tooltip-Equip: <bold><aqua>Equip
+      Tooltip-Unequip: <bold><red>Unequip
+Treasure-Chests-Loot:
+  Join-Messages: |-
+    <yellow>Join Message
+    <cosmetic>
+Treasure-Chests-Loot-Messages:
+  Join-Messages: <prefix> <bold><gold><name> found rare <cosmetic>
+Join-Messages:
+  Equip: <prefix> <green>You equipped <join-message-name>.
+  Unequip: <prefix> <gray>You unequipped <join-message-name>.
+  Preview-Label: <yellow>Preview:
+  Controls: <gray>Left click to equip or unequip.
+  Preview-Control: <aqua>Right click for a private preview.
+  Preview-Cooldown: <prefix> <yellow>Please wait before previewing again.
+  Preview-Unavailable: <prefix> <yellow>This Join Message cannot be previewed right now.
+  Server:
+    name: <bold><yellow>Server
+    Description: <gray>Announces your arrival to the server.
+    Message:
+      - '{BLANK}'
+      - '{CTR}<dark_gray>[<green>+<dark_gray>] <yellow><bold><player><reset> <gold>joined the server!'
+      - '{BLANK}'
+  Royal:
+    name: <bold><gold>Royal
+    Description: <gray>Enter with the welcome of a royal realm.
+    Message:
+      - '{BLANK}'
+      - '{CTR}<gold>The realm welcomes <yellow><bold><player><reset><gold>!'
+      - '{BLANK}'
+  Ender:
+    name: <bold><dark_purple>Ender
+    Description: <gray>Emerge from the void before the server.
+    Message:
+      - '{BLANK}'
+      - '{CTR}<dark_purple><bold><player><reset> <light_purple>emerged from the void...'
+      - '{BLANK}'
+  Lightning:
+    name: <bold><yellow>Lightning
+    Description: <gray>Strike the server with an electric arrival.
+    Message:
+      - '{BLANK}'
+      - '{CTR}<yellow><bold><player><reset> <gold>struck the server like lightning!'
+      - '{BLANK}'
+  Firework:
+    name: <bold><light_purple>Firework
+    Description: <gray>Make your arrival a compact celebration.
+    Message:
+      - '{BLANK}'
+      - '{CTR}<light_purple><bold><player><reset> <aqua>joined with a BANG!'
+      - '{BLANK}'
+  Dragon:
+    name: <bold><dark_red>Dragon
+    Description: <gray>Announce the arrival of a legendary presence.
+    Message:
+      - '{BLANK}'
+      - '{CTR}<gold>A legend has arrived: <dark_red><bold><player><reset><gold>!'
+      - '{BLANK}'
+  Mystery:
+    name: <bold><dark_gray>Mystery
+    Description: <gray>Let the server feel that something changed.
+    Message:
+      - '{BLANK}'
+      - '{CTR}<dark_gray>Something changed... <light_purple><bold><player><reset> <gray>is here.'
+      - '{BLANK}'
+  Arcade:
+    name: <bold><green>Arcade
+    Description: <gray>Join as the next player ready for action.
+    Message:
+      - '{BLANK}'
+      - '{CTR}<green><bold>PLAYER 1 READY! <yellow>>> <white><player>'
+      - '{BLANK}'
+  Game:
+    name: <bold><aqua>Game On
+    Description: <gray>Join the game and get straight into the action.
+    Message:
+      - '{BLANK}'
+      - '{CTR}<aqua><bold><player><reset> <white>joined the game. <green>GAME ON!'
+      - '{BLANK}'
+  Roblox:
+    name: <bold><red>Roblox
+    Description: <gray>Bring blocky chaos into Minecraft.
+    Message:
+      - '{BLANK}'
+      - '{CTR}<red><bold><player><reset> <yellow>is playing Roblox... <white>in Minecraft?!'
+      - '{BLANK}'
+  Spawn:
+    name: <bold><green>Spawned
+    Description: <gray>Appear naturally in the server world.
+    Message:
+      - '{BLANK}'
+      - '{CTR}<green>A wild <yellow><bold><player><reset> <green>appeared on the server!'
+      - '{BLANK}'
+  WildAppearance:
+    name: <bold><light_purple>Wild Appearance
+    Description: <gray>Trigger an unmistakable surprise encounter.
+    Message:
+      - '{BLANK}'
+      - '{CTR}<light_purple>!!! A wild <yellow><bold><player><reset> <light_purple>appeared!'
+      - '{BLANK}'
+  Landing:
+    name: <bold><aqua>Landing
+    Description: <gray>Swoop into the server with a smooth landing.
+    Message:
+      - '{BLANK}'
+      - '{CTR}<aqua>Swoooosh... <white><bold><player><reset> <green>has landed!'
+      - '{BLANK}'
+  BraceYourselves:
+    name: <bold><gold>Brace Yourselves
+    Description: <gray>Give everyone one last warning.
+    Message:
+      - '{BLANK}'
+      - '{CTR}<gold><bold>BRACE YOURSELVES! <yellow><player><reset> <gold>just joined.'
+      - '{BLANK}'
+  PartyOver:
+    name: <bold><dark_purple>Party Over
+    Description: <gray>End the party simply by arriving.
+    Message:
+      - '{BLANK}'
+      - '{CTR}<light_purple><bold><player><reset> <dark_purple>joined... <gray>The party is over.'
+      - '{BLANK}'
+  Overpowered:
+    name: <bold><red>Overpowered
+    Description: <gray>Make the balance team nervous.
+    Message:
+      - '{BLANK}'
+      - '{CTR}<yellow><bold><player><reset> <red>looks OP... <bold>PLEASE NERF!'
+      - '{BLANK}'
+  Achievement:
+    name: <bold><green>Achievement
+    Description: <gray>Unlock a rare achievement upon arrival.
+    Message:
+      - '{BLANK}'
+      - '{CTR}<dark_gray>[<green>ACHIEVEMENT<dark_gray>] <yellow><bold><player><reset><white>: <light_purple>[Ghostly Lover]'
+      - '{BLANK}'
+  Hacker:
+    name: <bold><dark_red>Hacker
+    Description: <gray>Raise a completely serious security alert.
+    Message:
+      - '{BLANK}'
+      - '{CTR}<dark_red>[!] The hacker <red><bold><player><reset> <dark_red>joined!'
+      - '{BLANK}'
+  MoneyMan:
+    name: <bold><green>Money Man
+    Description: <gray>Make a rich and unmistakable entrance.
+    Message:
+      - '{BLANK}'
+      - '{CTR}<green>$$$ <yellow><bold><player><reset> <green>the Money Man joined! <gold>%%%'
+      - '{BLANK}'
+  Minecrafter:
+    name: <bold><aqua>Minecrafter
+    Description: <gray>Join as the finest miner and crafter.
+    Message:
+      - '{BLANK}'
+      - '{CTR}<aqua>The best Minecrafter, <yellow><bold><player><reset><aqua>, joined!'
+      - '{BLANK}'
+  SuperSaiyan:
+    name: <bold><gold>Super Saiyan
+    Description: <gray>Power up before entering the server.
+    Message:
+      - '{BLANK}'
+      - '{CTR}<yellow><bold>AAAAAH! <gold>Super Saiyan <red><player><reset> <gold>joined!'
+      - '{BLANK}'
+  Impostor:
+    name: <bold><red>Impostor
+    Description: <gray>Make everyone instantly suspicious.
+    Message:
+      - '{BLANK}'
+      - '{CTR}<dark_gray>[<red>IMPOSTOR<dark_gray>] <white><bold><player><reset> <gray>joined... <red>sus!'
+      - '{BLANK}'
+  Hide:
+    name: <bold><dark_red>Hide
+    Description: <gray>Warn everyone before it is too late.
+    Message:
+      - '{BLANK}'
+      - '{CTR}<red><bold><player><reset> <dark_red>joined... <yellow><bold>HIDE! +'
+      - '{BLANK}'
+  Uchiha:
+    name: <bold><dark_red>Uchiha
+    Description: <gray>Enter with the menace of a legendary clan.
+    Message:
+      - '{BLANK}'
+      - '{CTR}<dark_red>Uchiha <red><bold><player><reset> <dark_red>has come for everyone...'
+      - '{BLANK}'
+  PirateKing:
+    name: <bold><gold>Pirate King
+    Description: <gray>Set sail toward the greatest adventure.
+    Message:
+      - '{BLANK}'
+      - '{CTR}<gold>Pirate King <yellow><bold>Monkey D. <player><reset> <gold>joined!'
+      - '{BLANK}'
+  Stardust:
+    name: <bold><light_purple>Stardust
+    Description: <gray>Drift into the server on a trail of starlight.
+    Message:
+      - '{BLANK}'
+      - '{CTR}<dark_purple>... <light_purple><bold><player><reset> <aqua>arrived on a trail of stardust <white>...'
+      - '{BLANK}'
+  Spotlight:
+    name: <bold><yellow>Spotlight
+    Description: <gray>Turn your arrival into the main event.
+    Message:
+      - '{BLANK}'
+      - '{CTR}<gold>[ <yellow>SPOTLIGHT ON <white><bold><player><reset><yellow>! <gold>]'
+      - '{BLANK}'
+  Speedrunner:
+    name: <bold><green>Speedrunner
+    Description: <gray>Join fast because every second counts.
+    Message:
+      - '{BLANK}'
+      - '{CTR}<green><bold><player><reset> <aqua>joined in record time! <yellow>[00:00.001]'
+      - '{BLANK}'

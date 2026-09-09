@@ -46,6 +46,7 @@ Clear:
   Emotes: <bold><red>Quitar emoticon activo
   Projectile-Effects: <bold><red>Borrar el proyectil actual
   Death-Effects: <bold><red>Quitar efecto de muerte actual
+  Join-Messages: <bold><red>Quitar mensaje de entrada activo
 Menu:
   Purchase-Rename:
     Button:
@@ -132,6 +133,16 @@ Menu:
       Lore: '<gray>Desbloqueaste: </gray><white><unlocked>'
       Tooltip-Equip: <bold><aqua>Equipar
       Tooltip-Unequip: <bold><red>Desequipar
+  Join-Messages:
+    Title: <bold>Mensajes de entrada
+    Button:
+      Name: <bold><yellow>Mensajes de entrada
+      Lore: |-
+        <gray>Anuncia tu llegada con estilo.
+
+        <gray>Desbloqueados: </gray><white><unlocked>
+      Tooltip-Equip: <bold><aqua>Equipar
+      Tooltip-Unequip: <bold><red>Desequipar
   Buy-Ammo:
     Title: <bold>Comprar Municion
   Misc:
@@ -187,6 +198,9 @@ Treasure-Chests-Loot:
   Projectile-Effects: |-
     <dark_purple>Efecto de Proyectil
     <cosmetic>
+  Join-Messages: |-
+    <yellow>Mensaje de entrada
+    <cosmetic>
 Treasure-Chests-Loot-Messages:
   Ammo: <prefix> <bold><gold><name> obtuvo <ammo> municiones de <cosmetic> 
   Money: <prefix> <bold><gold><name> obtuvo $<money>
@@ -200,6 +214,211 @@ Treasure-Chests-Loot-Messages:
   Emotes: '<prefix> <bold><gold><name> obtuvo  <cosmetic> de calidad: RARA'
   Death-Effects: '<prefix> <bold><gold><name> obtuvo  <cosmetic> de calidad: RARA'
   Projectile-Effects: '<prefix> <bold><gold><name> obtuvo  <cosmetic> de calidad: RARA'
+  Join-Messages: <prefix> <bold><gold><name> obtuvo el mensaje de entrada <cosmetic>
+Join-Messages:
+  Equip: <prefix> <green>Equipaste <join-message-name>.
+  Unequip: <prefix> <gray>Desequipaste <join-message-name>.
+  Preview-Label: <yellow>Vista previa:
+  Controls: <gray>Clic izquierdo para equipar o desequipar.
+  Preview-Control: <aqua>Clic derecho para una vista previa privada.
+  Preview-Cooldown: <prefix> <yellow>Espera antes de volver a previsualizar.
+  Preview-Unavailable: <prefix> <yellow>Este mensaje de entrada no se puede previsualizar ahora.
+  Server:
+    name: <bold><yellow>Servidor
+    Description: <gray>Anuncia tu llegada al servidor.
+    Message:
+      - '{BLANK}'
+      - '{CTR}<dark_gray>[<green>+<dark_gray>] <yellow><bold><player><reset> <gold>entró al servidor!'
+      - '{BLANK}'
+  Royal:
+    name: <bold><gold>Realeza
+    Description: <gray>Entra con la bienvenida de un reino.
+    Message:
+      - '{BLANK}'
+      - '{CTR}<gold>El reino recibe a <yellow><bold><player><reset><gold>!'
+      - '{BLANK}'
+  Ender:
+    name: <bold><dark_purple>Ender
+    Description: <gray>Surge del vacio frente al servidor.
+    Message:
+      - '{BLANK}'
+      - '{CTR}<dark_purple><bold><player><reset> <light_purple>surgió del vacío...'
+      - '{BLANK}'
+  Lightning:
+    name: <bold><yellow>Relampago
+    Description: <gray>Impacta el servidor con una llegada electrica.
+    Message:
+      - '{BLANK}'
+      - '{CTR}<yellow><bold><player><reset> <gold>¡cayó como un relámpago!'
+      - '{BLANK}'
+  Firework:
+    name: <bold><light_purple>Fuegos artificiales
+    Description: <gray>Convierte tu llegada en una celebracion.
+    Message:
+      - '{BLANK}'
+      - '{CTR}<light_purple><bold><player><reset> <aqua>entró con una EXPLOSIÓN!'
+      - '{BLANK}'
+  Dragon:
+    name: <bold><dark_red>Dragon
+    Description: <gray>Anuncia la llegada de una presencia legendaria.
+    Message:
+      - '{BLANK}'
+      - '{CTR}<gold>Una leyenda ha llegado: <dark_red><bold><player><reset><gold>!'
+      - '{BLANK}'
+  Mystery:
+    name: <bold><dark_gray>Misterio
+    Description: <gray>Haz que el servidor sienta que algo cambio.
+    Message:
+      - '{BLANK}'
+      - '{CTR}<dark_gray>Algo cambió... <light_purple><bold><player><reset> <gray>está aquí.'
+      - '{BLANK}'
+  Arcade:
+    name: <bold><green>Arcade
+    Description: <gray>Entra como el proximo jugador listo para la accion.
+    Message:
+      - '{BLANK}'
+      - '{CTR}<green><bold>JUGADOR 1 LISTO! <yellow>>> <white><player>'
+      - '{BLANK}'
+  Game:
+    name: <bold><aqua>Partida
+    Description: <gray>Entra al juego y ve directo a la acción.
+    Message:
+      - '{BLANK}'
+      - '{CTR}<aqua><bold><player><reset> <white>se unió al juego. <green>¡A JUGAR!'
+      - '{BLANK}'
+  Roblox:
+    name: <bold><red>Roblox
+    Description: <gray>Lleva el caos de bloques a Minecraft.
+    Message:
+      - '{BLANK}'
+      - '{CTR}<red><bold><player><reset> <yellow>juega Roblox... <white>¿en Minecraft?!'
+      - '{BLANK}'
+  Spawn:
+    name: <bold><green>Aparición
+    Description: <gray>Aparece naturalmente en el mundo del servidor.
+    Message:
+      - '{BLANK}'
+      - '{CTR}<green>¡Un <yellow><bold><player><reset> <green>apareció en el servidor!'
+      - '{BLANK}'
+  WildAppearance:
+    name: <bold><light_purple>Aparición salvaje
+    Description: <gray>Provoca un encuentro sorpresa inconfundible.
+    Message:
+      - '{BLANK}'
+      - '{CTR}<light_purple>!!! ¡Un <yellow><bold><player><reset> <light_purple>salvaje apareció!'
+      - '{BLANK}'
+  Landing:
+    name: <bold><aqua>Aterrizaje
+    Description: <gray>Entra al servidor con un aterrizaje impecable.
+    Message:
+      - '{BLANK}'
+      - '{CTR}<aqua>Swoooosh... <white><bold><player><reset> <green>ha aterrizado!'
+      - '{BLANK}'
+  BraceYourselves:
+    name: <bold><gold>Prepárense
+    Description: <gray>Dales a todos una última advertencia.
+    Message:
+      - '{BLANK}'
+      - '{CTR}<gold><bold>¡PREPÁRENSE! <yellow><player><reset> <gold>acaba de unirse.'
+      - '{BLANK}'
+  PartyOver:
+    name: <bold><dark_purple>Fin de la fiesta
+    Description: <gray>Termina la fiesta con solo aparecer.
+    Message:
+      - '{BLANK}'
+      - '{CTR}<light_purple><bold><player><reset> <dark_purple>se unió... <gray>La fiesta terminó.'
+      - '{BLANK}'
+  Overpowered:
+    name: <bold><red>Demasiado OP
+    Description: <gray>Pon nervioso al equipo de balance.
+    Message:
+      - '{BLANK}'
+      - '{CTR}<yellow><bold><player><reset> <red>parece OP... <bold>¡NERF, POR FAVOR!'
+      - '{BLANK}'
+  Achievement:
+    name: <bold><green>Logro
+    Description: <gray>Desbloquea un logro raro al llegar.
+    Message:
+      - '{BLANK}'
+      - '{CTR}<dark_gray>[<green>LOGRO<dark_gray>] <yellow><bold><player><reset><white>: <light_purple>[Ghostly Lover]'
+      - '{BLANK}'
+  Hacker:
+    name: <bold><dark_red>Chitero
+    Description: <gray>Activa una alerta de seguridad totalmente seria.
+    Message:
+      - '{BLANK}'
+      - '{CTR}<dark_red>[!] ¡El chitero <red><bold><player><reset> <dark_red>se unió!'
+      - '{BLANK}'
+  MoneyMan:
+    name: <bold><green>Money Man
+    Description: <gray>Haz una entrada rica e inconfundible.
+    Message:
+      - '{BLANK}'
+      - '{CTR}<green>$$$ <yellow><bold><player><reset><green>, el Money Man, se unió! <gold>%%%'
+      - '{BLANK}'
+  Minecrafter:
+    name: <bold><aqua>Minecraftero
+    Description: <gray>Entra como el mejor minero y constructor.
+    Message:
+      - '{BLANK}'
+      - '{CTR}<aqua>¡El mejor minecraftero, <yellow><bold><player><reset><aqua>, se unió!'
+      - '{BLANK}'
+  SuperSaiyan:
+    name: <bold><gold>Super Saiyajin
+    Description: <gray>Eleva tu poder antes de entrar al servidor.
+    Message:
+      - '{BLANK}'
+      - '{CTR}<yellow><bold>¡AAAAAH! <gold>Super Saiyajin <red><player><reset> <gold>llegó!'
+      - '{BLANK}'
+  Impostor:
+    name: <bold><red>Impostor
+    Description: <gray>Haz que todos sospechen inmediatamente.
+    Message:
+      - '{BLANK}'
+      - '{CTR}<dark_gray>[<red>IMPOSTOR<dark_gray>] <white><bold><player><reset> <gray>se unió... <red>¡sospechoso!'
+      - '{BLANK}'
+  Hide:
+    name: <bold><dark_red>Escóndete
+    Description: <gray>Advierte a todos antes de que sea tarde.
+    Message:
+      - '{BLANK}'
+      - '{CTR}<red><bold><player><reset> <dark_red>se unió... <yellow><bold>¡ESCÓNDETE! +'
+      - '{BLANK}'
+  Uchiha:
+    name: <bold><dark_red>Uchiha
+    Description: <gray>Entra con la amenaza de un clan legendario.
+    Message:
+      - '{BLANK}'
+      - '{CTR}<dark_red>Uchiha <red><bold><player><reset> <dark_red>ha venido por todos...'
+      - '{BLANK}'
+  PirateKing:
+    name: <bold><gold>Rey de los Piratas
+    Description: <gray>Zarpa hacia la aventura más grande.
+    Message:
+      - '{BLANK}'
+      - '{CTR}<gold>¡El Rey Pirata <yellow><bold>Monkey D. <player><reset> <gold>llegó!'
+      - '{BLANK}'
+  Stardust:
+    name: <bold><light_purple>Polvo estelar
+    Description: <gray>Entra al servidor sobre un rastro de estrellas.
+    Message:
+      - '{BLANK}'
+      - '{CTR}<dark_purple>... <light_purple><bold><player><reset> <aqua>llegó sobre un rastro estelar <white>...'
+      - '{BLANK}'
+  Spotlight:
+    name: <bold><yellow>Reflectores
+    Description: <gray>Convierte tu llegada en el evento principal.
+    Message:
+      - '{BLANK}'
+      - '{CTR}<gold>[ <yellow>¡REFLECTORES SOBRE <white><bold><player><reset><yellow>! <gold>]'
+      - '{BLANK}'
+  Speedrunner:
+    name: <bold><green>Speedrunner
+    Description: <gray>Entra rápido porque cada segundo cuenta.
+    Message:
+      - '{BLANK}'
+      - '{CTR}<green><bold><player><reset> <aqua>¡nuevo récord! <yellow>[00:00.001]'
+      - '{BLANK}'
 Permission-Lore:
   Showroom: '<gray>Permiso: </gray><gold>Usable en sala de exposición'
   Permission-No: '<gray>Permiso: </gray><bold><dark_red>¡No!'

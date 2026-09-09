@@ -21,6 +21,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.Reader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -65,18 +66,22 @@ public class MessageManager {
                 messagesConfig.set(target, value.replace("<death-effectname>", "<kill-effectname>"));
             }
         }
-        // Shared English defaults until the new category is translated; local overrides always win.
-        try (Reader killEffects = UltraCosmeticsData.get().getPlugin().getFileReader("messages/killeffects.yml")) {
-            YamlConfiguration defaults = YamlConfiguration.loadConfiguration(killEffects);
-            for (String key : defaults.getKeys(true)) {
-                if (defaults.isString(key)) addMessageInternal(key, defaults.getString(key));
-            }
-        } catch (java.io.IOException e) {
-            throw new IllegalStateException("Cannot load Kill Effects messages", e);
-        }
+        loadSharedDefaults("killeffects.yml");
+        loadSharedDefaults("joinmessages.yml");
         messagesConfig.save();
         miniMessage = buildMinimessage(true);
         success = true;
+    }
+
+    private void loadSharedDefaults(String resourceName) {
+        try (Reader reader = UltraCosmeticsData.get().getPlugin().getFileReader("messages/" + resourceName)) {
+            YamlConfiguration defaults = YamlConfiguration.loadConfiguration(reader);
+            for (String key : defaults.getKeys(true)) {
+                if (defaults.isString(key) || defaults.isList(key)) addMessageInternal(key, defaults.get(key));
+            }
+        } catch (java.io.IOException e) {
+            throw new IllegalStateException("Cannot load shared messages from " + resourceName, e);
+        }
     }
 
     private MiniMessage buildMinimessage(boolean includePrefix) {
@@ -121,7 +126,7 @@ public class MessageManager {
         return result;
     }
 
-    private void addMessageInternal(String path, String message) {
+    private void addMessageInternal(String path, Object message) {
         if (messagesConfig.addDefault(path, message)) {
             // Has its own if-block to avoid the dead code warning
             if (CosmeticType.GENERATE_MISSING_MESSAGES) {
@@ -162,7 +167,7 @@ public class MessageManager {
             }
         }
         for (String key : defaults.getKeys(true)) {
-            addMessageInternal(key, defaults.getString(key));
+            if (defaults.isString(key) || defaults.isList(key)) addMessageInternal(key, defaults.get(key));
         }
     }
 
@@ -322,6 +327,15 @@ public class MessageManager {
      */
     public static void addMessage(String path, String message) {
         getInstance().addMessageInternal(path, message);
+    }
+
+    public static List<String> getTemplateLines(String messagePath) {
+        MessageManager manager = getInstance();
+        if (manager.messagesConfig.fileConfiguration.isList(messagePath)) {
+            return manager.messagesConfig.getStringList(messagePath);
+        }
+        manager.checkMessageExists(messagePath);
+        return Collections.singletonList(manager.messagesConfig.getString(messagePath));
     }
 
     /**

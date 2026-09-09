@@ -40,6 +40,8 @@ public enum Category {
     PROJECTILE_EFFECTS("Projectile-Effects", "projectile-effectname", "projectileeffects", "p", false),
     KILL_EFFECTS("Kill-Effects", "kill-effectname", "killeffects", "k", false,
             () -> UltraCosmeticsData.get().getPlugin().getKillEffectManager() != null),
+    JOIN_MESSAGES("Join-Messages", "join-message-name", "joinmessages", "jm", false,
+            () -> UltraCosmeticsData.get().getServerVersion() == be.isach.ultracosmetics.version.ServerVersion.v1_8),
     // Retained only so WorldGuard can deserialize historical enum flags. Never exposed as a product.
     @Deprecated
     DEATH_EFFECTS("Death-Effects", "death-effectname", "deatheffects", "d", false, () -> false),
@@ -64,6 +66,10 @@ public enum Category {
         if (name.equalsIgnoreCase("DEATH_EFFECTS") || name.equalsIgnoreCase("Death-Effects")) return KILL_EFFECTS;
         String lowerName = name.toLowerCase();
         for (Category cat : values()) {
+            if (name.equalsIgnoreCase(cat.name()) || name.equalsIgnoreCase(cat.configPath)
+                    || name.equalsIgnoreCase(cat.getStorageId())) {
+                return cat == DEATH_EFFECTS ? KILL_EFFECTS : cat;
+            }
             if (lowerName.startsWith(cat.prefix)) {
                 return cat == DEATH_EFFECTS ? KILL_EFFECTS : cat;
             }
@@ -87,6 +93,7 @@ public enum Category {
             case PROJECTILE_EFFECTS: return "projectile_effects";
             case KILL_EFFECTS:
             case DEATH_EFFECTS: return "death_effects";
+            case JOIN_MESSAGES: return "join_messages";
             default: throw new IllegalStateException("Missing storage identifier for " + this);
         }
     }

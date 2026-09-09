@@ -106,6 +106,7 @@ public abstract class CosmeticType<T extends Cosmetic<?>> {
         EmoteType.register();
         ProjectileEffectType.register(version);
         KillEffectType.register();
+        JoinMessageType.register();
 
         // Permissions registered by cosmetics are not fully calculated until here,
         // reducing loading time.
