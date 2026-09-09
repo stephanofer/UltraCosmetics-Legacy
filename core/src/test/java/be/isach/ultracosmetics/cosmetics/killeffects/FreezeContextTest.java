@@ -9,6 +9,7 @@ import be.isach.ultracosmetics.cosmetics.killeffects.runtime.PacketBudget;
 import org.junit.Test;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -72,7 +73,7 @@ public class FreezeContextTest {
     }
 
     @Test
-    public void iceFormsCenteredTwoByTwoLayersFromFeetToAboveHeadAndStaysInPlace() {
+    public void iceFormsTouchingTwoByTwoLayersEvenAfterLegacyPacketRounding() {
         for (float yaw : new float[]{0, 90, 180, -90, 45, 123.5f}) {
             Map<Integer, double[]> spawned = new HashMap<>();
             Map<Integer, double[]> teleported = new HashMap<>();
@@ -101,7 +102,10 @@ public class FreezeContextTest {
             KillEffectScene scene = new KillEffectScene(context, renderer, new EntityIdAllocator(),
                     new KillEffectSettings(Collections.emptyMap()), new PacketBudget(1024, 12000),
                     Logger.getAnonymousLogger());
-            double cos = Math.cos(Math.toRadians(yaw)), sin = Math.sin(Math.toRadians(yaw));
+            Set<List<Double>> clientCenters = new HashSet<>();
+            double clientX = Math.floor(death.x * 32) / 32;
+            double clientZ = Math.floor(death.z * 32) / 32;
+            double firstStandY = Math.floor((death.y + 0.3125 - 1.6953125) * 32) / 32;
             for (int layer = 0; layer < 4; layer++) {
                 int[] ids = scene.spawnIce(layer);
                 assertEquals(4, ids.length);
@@ -109,15 +113,23 @@ public class FreezeContextTest {
                 for (int column = 0; column < ids.length; column++) {
                     double[] position = spawned.get(ids[column]);
                     double dx = position[0] - death.x, dz = position[2] - death.z;
-                    assertEquals((column % 2 - 0.5) * 0.625, dx * cos + dz * sin, 1e-9);
-                    assertEquals((column / 2 - 0.5) * 0.625, -dx * sin + dz * cos, 1e-9);
+                    assertEquals((column % 2 - 0.5) * 0.625, dx, 1e-9);
+                    assertEquals((column / 2 - 0.5) * 0.625, dz, 1e-9);
                     // The rendered cube's bottom is the layer boundary, not the stand's feet.
                     assertEquals(layer * 0.625, position[1] + 1.6953125 - 0.3125 - death.y, 1e-9);
-                    assertEquals(yaw, position[3], 0);
+                    assertEquals(0, position[3], 0);
                     assertArrayEquals(position, teleported.get(ids[column]), 0);
+                    double x = Math.floor(position[0] * 32) / 32;
+                    double y = Math.floor(position[1] * 32) / 32;
+                    double z = Math.floor(position[2] * 32) / 32;
+                    assertEquals((column % 2 - 0.5) * 0.625, x - clientX, 0);
+                    assertEquals(layer * 0.625, y - firstStandY, 0);
+                    assertEquals((column / 2 - 0.5) * 0.625, z - clientZ, 0);
+                    assertTrue("Each helmet must occupy a distinct grid cell", clientCenters.add(Arrays.asList(x, y, z)));
                 }
             }
             assertEquals(16, spawned.size());
+            assertEquals(16, clientCenters.size());
             assertEquals(spawned.keySet(), hidden);
             assertEquals(spawned.keySet(), equipped);
         }

@@ -127,15 +127,13 @@ public final class KillEffectScene {
 
     public int[] spawnIce(int layer) {
         int[] ids = new int[4];
-        float yaw = context.death.yaw;
-        double angle = Math.toRadians(yaw);
+        // Axis-aligned 0.625-block edges occupy exactly 20 units of the 1.8 packet grid.
+        // Rotating the grid would round centers and helmet angles independently, breaking shared faces.
+        float yaw = 0;
         for (int i = 0; i < ids.length; i++) {
             int id = ids[i] = allocate();
-            // Adjacent helmet cubes share a face; every layer uses the same body-local axis.
-            double side = (i % 2 - 0.5) * ICE_SIZE;
-            double depth = (i / 2 - 0.5) * ICE_SIZE;
-            double dx = Math.cos(angle) * side - Math.sin(angle) * depth;
-            double dz = Math.sin(angle) * side + Math.cos(angle) * depth;
+            double dx = (i % 2 - 0.5) * ICE_SIZE;
+            double dz = (i / 2 - 0.5) * ICE_SIZE;
             double dy = (layer + 0.5) * ICE_SIZE - ICE_HEAD_CENTER;
             iceOffsets.put(id, new double[]{dx, dy, dz, yaw});
             for (UUID viewer : audienceIds) {
