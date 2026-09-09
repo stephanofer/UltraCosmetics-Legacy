@@ -24,7 +24,7 @@ dependencies {
     // but subprojects must reference XSeries as shaded.
     //api 'com.github.cryptomorin:XSeries:9.9.0'
     api fileTree(dir: '.', include: ['XSeries-*-datatags.jar'])
-    implementation 'org.bstats:bstats-bukkit:3.0.2'
+    implementation 'org.bstats:bstats-bukkit:3.2.1'
     compileOnly 'net.luckperms:api:5.4'
     compileOnly "me.lokka30:treasury-api:2.0.2-SNAPSHOT"
     compileOnly 'com.palmergames.bukkit.towny:towny:0.100.2.8'
